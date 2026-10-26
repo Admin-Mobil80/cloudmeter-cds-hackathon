@@ -1,0 +1,1801 @@
+/* ===========================================================
+   CloudMeter — shared design tokens & layout (web)
+   =========================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* Chrome & ink — dataviz reference palette, light mode */
+  --surface-1:      #ffffff;
+  --surface-2:      #fcfcfb;
+  --page-plane:     #f5f6f4;
+  --text-primary:   #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted:     #898781;
+  --gridline:       #e1e0d9;
+  --border:         rgba(11, 11, 11, 0.10);
+  --border-strong:  rgba(11, 11, 11, 0.16);
+
+  /* Brand */
+  --brand:          #2a78d6;
+  --brand-dark:     #184f95;
+  --brand-wash:     #eaf1fc;
+  --sidebar-bg:     #0d1420;
+  --sidebar-ink:    #c7cedb;
+  --sidebar-ink-dim:#7c879b;
+  --sidebar-active: #16233a;
+
+  /* Categorical — provider identity (fixed order, never cycled) */
+  --provider-aws:     #2a78d6; /* slot 1 blue */
+  --provider-azure:   #eb6834; /* slot 2 orange */
+  --provider-gcp:     #1baf7a; /* slot 3 aqua */
+  --provider-alibaba: #eda100; /* slot 4 yellow */
+  --provider-huawei:  #e87ba4; /* slot 5 magenta */
+  --provider-openai:  #10a37f; /* slot 6 teal — OpenAI, not a cloud but billed like one */
+  --provider-whatsapp:#25d366; /* slot 7 green — WhatsApp Business messaging spend */
+  --provider-adhoc:   #6b5bd2; /* slot 8 violet — hand-entered AI subscriptions, no API behind them */
+
+  /* Status (fixed — never themed) */
+  --status-good:     #0ca30c;
+  --status-warning:  #fab219;
+  --status-serious:  #ec835a;
+  --status-critical: #d03b3b;
+  --status-good-text:#006300;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-card: 0 1px 2px rgba(11,11,11,0.04), 0 4px 16px rgba(11,11,11,0.05);
+}
+
+* { box-sizing: border-box; }
+/* The UA rule for [hidden] is display:none at the lowest precedence, so any
+   component that sets its own display silently overrides it. Everything using
+   the attribute here is a component with a display value. */
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--page-plane);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; }
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+/* ---------------- Sidebar ---------------- */
+.sidebar {
+  background: var(--sidebar-bg);
+  color: var(--sidebar-ink);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px 0;
+}
+.sidebar-brand .mark {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3987e5, #1baf7a);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #fff; font-size: 14px;
+}
+/* The text column between the CM mark and the switcher chevron.
+   min-width:0 is the whole fix: a flex item will not shrink below its content
+   by default, so a long workspace name made this column wider than the
+   sidebar and pushed the chevron off the edge — leaving no way to switch
+   account at all. Now the name truncates and the chevron always has its
+   24px. */
+.sidebar-brand > span:not(.mark) { flex: 1 1 auto; min-width: 0; }
+.sidebar-brand .name {
+  font-weight: 650; font-size: 15px; color: #fff; letter-spacing: -0.01em;
+  display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* Holds the workspace name, which is user-supplied and can be long — clamp it
+   rather than letting it wrap and push the nav down. Bounded by the column
+   above rather than a fixed pixel width, which could not know how much room
+   the chevron needed. */
+.sidebar-brand .tag {
+  font-size: 11px; color: var(--sidebar-ink-dim); display: block; margin-top: -2px;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ---------------- CloudMeter account switcher ----------------
+   Only appears for people who belong to more than one account. */
+.sidebar-brand.has-switcher { position: relative; }
+/* flex:none — the chevron is the control that fixes everything else;
+   it must never be the thing that gets squeezed out. */
+.account-switcher { margin-left: auto; flex: none; }
+.account-switcher-btn {
+  width: 24px; height: 24px; border-radius: 6px; flex: none;
+  background: transparent; border: none; color: var(--sidebar-ink-dim);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.account-switcher-btn svg { width: 14px; height: 14px; }
+.account-switcher-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.account-switcher-menu {
+  position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 20;
+  background: #16233a; border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm); padding: 6px; overflow: hidden;
+  box-shadow: 0 18px 36px -12px rgba(0,0,0,0.6);
+}
+.account-switcher-head {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--sidebar-ink-dim); padding: 6px 8px 4px;
+}
+.account-switcher-item {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+  width: 100%; text-align: left; padding: 7px 8px; border: none; border-radius: 6px;
+  background: transparent; color: var(--sidebar-ink); cursor: pointer;
+}
+.account-switcher-item:hover:not(:disabled) { background: rgba(255,255,255,0.07); }
+.account-switcher-item .n { font-size: 12.5px; font-weight: 600; color: #fff; }
+.account-switcher-item .r { font-size: 10.5px; color: var(--sidebar-ink-dim); }
+.account-switcher-item.is-current { background: rgba(57,135,229,0.16); cursor: default; }
+.account-switcher-item.is-current .n::after { content: ' ·  current'; font-weight: 500; color: #9ec5f4; }
+
+.beta-pill {
+  margin: 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ec5f4;
+  background: rgba(57,135,229,0.14);
+  border: 1px solid rgba(57,135,229,0.30);
+  border-radius: 999px;
+  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+}
+.beta-pill .dot { width: 6px; height: 6px; border-radius: 999px; background: #3987e5; }
+
+.nav-group { display: flex; flex-direction: column; gap: 2px; }
+.nav-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--sidebar-ink-dim);
+  padding: 0 12px;
+  margin: 10px 0 4px;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--sidebar-ink);
+}
+.nav-link:hover { background: rgba(255,255,255,0.05); }
+.nav-link.active { background: var(--sidebar-active); color: #fff; }
+.nav-link .ic { width: 17px; height: 17px; flex: none; opacity: 0.9; }
+.nav-link .count {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--status-critical);
+  color: #fff;
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 8px;
+}
+.avatar {
+  width: 30px; height: 30px; border-radius: 999px;
+  background: #24304a; color: #cfe0fb;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex: none;
+}
+.sidebar-footer .who { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.sidebar-footer .who .n { font-size: 12.5px; font-weight: 600; color: #fff; }
+.sidebar-footer .who .r { font-size: 11px; color: var(--sidebar-ink-dim); }
+.icon-btn-ghost {
+  margin-left: auto; flex: none; width: 28px; height: 28px; border-radius: 8px;
+  background: transparent; border: none; color: var(--sidebar-ink-dim);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.icon-btn-ghost svg { width: 15px; height: 15px; }
+.icon-btn-ghost:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+/* ---------------- Main ---------------- */
+.main { min-width: 0; }
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 28px;
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 5;
+}
+.topbar h1 { font-size: 18px; font-weight: 650; margin: 0; letter-spacing: -0.01em; }
+/* Organization name beside the page title. Deliberately quieter and lighter
+   than the title itself — it is context, not the heading. */
+.page-org { color: var(--text-secondary); font-weight: 500; font-size: 0.8em; margin-left: 6px; }
+.topbar .sub { font-size: 12.5px; color: var(--text-secondary); margin-top: 2px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.detail-title-row { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+.detail-title-row .provider-badge-lg { width: 34px; height: 34px; font-size: 11px; }
+
+/* Account header — everything identifying the account on one line, so the
+   costs it exists to show start near the top of the viewport rather than
+   below five stacked rows of chrome. Wraps rather than truncating: an account
+   name and a manager's address are both things you need to read in full. */
+.topbar:has(.acc-head) { padding-top: 12px; padding-bottom: 12px; }
+.acc-head { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-width: 0; }
+.acc-head h1 { font-size: 17px; font-weight: 650; margin: 0; letter-spacing: -0.01em; white-space: nowrap; }
+.acc-head .provider-badge-lg { width: 28px; height: 28px; font-size: 10px; flex: none; }
+/* Sits next to the title but stays quiet until the header is hovered — the
+   name is a heading first and a control second. */
+.acc-name-edit {
+  display: flex; align-items: center; justify-content: center; flex: none;
+  width: 24px; height: 24px; margin-left: -4px; padding: 0;
+  background: none; border: none; border-radius: 6px; cursor: pointer;
+  color: var(--text-muted); opacity: 0; transition: opacity .12s, color .12s;
+}
+.acc-name-edit svg { width: 13px; height: 13px; }
+.acc-head:hover .acc-name-edit, .acc-name-edit:focus-visible { opacity: 1; }
+.acc-name-edit:hover { color: var(--text-primary); background: var(--surface-2); }
+.acc-back {
+  display: flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 7px; flex: none;
+  color: var(--text-secondary); border: 1px solid var(--border);
+}
+.acc-back svg { width: 15px; height: 15px; }
+.acc-back:hover { background: var(--surface-2); color: var(--brand); border-color: var(--brand); }
+.acc-meta {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  font-size: 12.5px; color: var(--text-secondary); min-width: 0;
+}
+/* The slots hold a leading separator plus their own content, and contribute
+   their children straight to the row so the gap applies evenly across all of
+   it. An empty slot then takes up nothing, separator included. */
+#acc-meta-static, #acc-owner-slot, #acc-managed-slot { display: contents; }
+.acc-meta-sep { color: var(--text-muted); opacity: 0.6; }
+
+/* Team roster — which cloud accounts a scoped Member can reach. */
+.member-scope { font-size: 11.5px; color: var(--text-secondary); margin-top: 3px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.member-scope.is-empty { color: #8a5a00; }
+/* A native <dialog>, so it gets the top layer and Esc-to-close for free —
+   the older .modal-overlay markup predates that and isn't worth retrofitting
+   for one panel. */
+.scope-modal {
+  width: min(460px, calc(100vw - 32px));
+  border: 1px solid var(--border); border-radius: var(--radius-lg);
+  background: var(--surface-1); color: var(--text-primary);
+  padding: 26px 28px; box-shadow: 0 40px 80px -20px rgba(0,0,0,0.45);
+}
+.scope-modal::backdrop { background: rgba(11,11,11,0.45); }
+.scope-modal h2 { font-size: 16px; font-weight: 650; margin: 0 0 6px; }
+.scope-modal .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+.scope-modal .field-error { margin: 6px 0 0; }
+.scope-options { display: flex; flex-direction: column; gap: 2px; margin: 14px 0 4px; max-height: 320px; overflow-y: auto; }
+.scope-option { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13.5px; }
+.scope-option:hover { background: var(--surface-2); }
+.scope-option input { width: 15px; height: 15px; flex: none; accent-color: var(--brand); }
+.scope-option-meta { display: block; font-size: 11.5px; color: var(--text-muted); }
+.handover-list {
+  margin: 14px 0 0; padding: 12px 16px 12px 30px; font-size: 13.5px;
+  background: var(--surface-2); border: 1px solid var(--gridline); border-radius: var(--radius-sm);
+}
+.handover-list li { margin: 2px 0; }
+.notify-row { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; cursor: pointer; }
+.notify-row + .notify-row { border-top: 1px solid var(--gridline); }
+.notify-row input { width: 16px; height: 16px; margin-top: 2px; flex: none; accent-color: var(--brand); }
+.notify-row .n { display: block; font-size: 13.5px; font-weight: 650; }
+.notify-row .d { display: block; font-size: 12.5px; color: var(--text-secondary); margin-top: 2px; }
+.notify-note { font-size: 12px; color: var(--text-muted); margin: 12px 0 0; }
+/* "Not in yet" is prose in a row of figures, so it steps back rather than
+   competing with the numbers beside it. */
+.mcs-item .v.is-pending { font-size: 14px; font-weight: 600; color: var(--text-muted); }
+
+/* Stands in for the Role dropdown when there is only one role to choose.
+   Sized like the input it replaces so the invite row keeps its rhythm. */
+.over-limit { color: var(--status-critical); font-weight: 600; }
+
+.invite-role-fixed {
+  display: inline-flex; align-items: center; height: 40px; padding: 0 2px;
+  font-size: 14px; font-weight: 600; color: var(--text-primary);
+}
+
+.acct-notify-bulk { display: flex; align-items: center; gap: 12px; }
+.acct-notify-head, .acct-notify-row {
+  display: grid; grid-template-columns: 1fr 96px 96px; align-items: center; gap: 12px;
+}
+.acct-notify-head {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--text-muted); padding-bottom: 8px; border-bottom: 1px solid var(--gridline);
+}
+.acct-notify-head .c, .acct-notify-row .c { text-align: center; }
+.acct-notify-row { padding: 11px 0; border-bottom: 1px solid var(--gridline); }
+.acct-notify-row:last-child { border-bottom: none; }
+.acct-notify-row .n { display: block; font-size: 13.5px; font-weight: 600; }
+.acct-notify-row .d { display: block; font-size: 11.5px; color: var(--text-muted); }
+.acct-notify-row input { width: 16px; height: 16px; accent-color: var(--brand); }
+
+.notify-channels { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--gridline); display: flex; flex-direction: column; gap: 8px; }
+.notify-channel { display: flex; align-items: center; gap: 10px; font-size: 13px; flex-wrap: wrap; }
+.notify-channel .lbl { min-width: 72px; color: var(--text-secondary); }
+.notify-channel .val { font-weight: 600; }
+.notify-channel .val.is-unset { font-weight: 500; color: var(--text-muted); }
+.scope-selectall {
+  display: flex; align-items: center; gap: 12px; margin-top: 14px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--gridline);
+}
+.scope-count { margin-left: auto; font-size: 12px; color: var(--text-muted); }
+/* The editor may drop to its own row when the line is full, but it should stay
+   a single tidy row once there rather than breaking up mid-control. */
+.acc-meta .acc-owner-edit { flex-wrap: nowrap; gap: 6px; }
+.acc-meta .field-input-sm { min-width: 200px; }
+
+.freshness {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--status-good-text);
+  background: #eafaea; border: 1px solid rgba(12,163,12,0.25);
+  border-radius: 999px; padding: 5px 10px;
+}
+.freshness .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--status-good); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+/* ---------------- Loading skeletons ----------------
+   Placed directly in the HTML so they're painted before any script runs,
+   then replaced when real data arrives. Sized to match what they stand in
+   for, so nothing shifts on the page when the content lands. */
+.sk {
+  display: block; border-radius: 5px;
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--gridline) 37%, var(--surface-2) 63%);
+  background-size: 400% 100%;
+  animation: sk-shimmer 1.4s ease-in-out infinite;
+}
+@keyframes sk-shimmer { from { background-position: 100% 50%; } to { background-position: 0 50%; } }
+.stat-tile .value .sk { height: 27px; width: 72px; margin-top: 4px; }
+.stat-tile .row .sk { height: 13px; width: 108px; }
+.sk-row { display: flex; align-items: center; gap: 16px; padding: 15px 20px; border-top: 1px solid var(--gridline); }
+.sk-row .sk-grow { flex: 1; }
+.sk-text { height: 12px; }
+.sk-block { height: 230px; border-radius: var(--radius-sm); }
+
+/* A shimmer that never stops is exactly the kind of motion this setting is
+   meant to suppress — hold a flat placeholder instead. */
+@media (prefers-reduced-motion: reduce) {
+  .sk { animation: none; background: var(--surface-2); }
+}
+
+.provider-stack { display: flex; align-items: center; }
+.provider-chip {
+  width: 26px; height: 26px; border-radius: 999px;
+  border: 2px solid var(--surface-1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; color: #fff;
+  margin-left: -8px;
+}
+.provider-chip:first-child { margin-left: 0; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600;
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-1); color: var(--text-primary);
+  cursor: pointer;
+}
+.btn:hover:not(:disabled) { background: var(--surface-2); }
+/* A disabled button has to look disabled.
+   Until now only .btn-refresh had this, so every other disabled .btn kept
+   cursor:pointer and its hover highlight — it refused the click while looking
+   perfectly clickable. The Notifications page made that visible: Connect Slack
+   on a plan without Slack sat there inviting a press that did nothing. Same
+   values as .btn-refresh:disabled, so the two cannot drift apart. */
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--brand-dark); }
+.btn-ghost { border-color: transparent; }
+.btn-sm { padding: 6px 10px; font-size: 12.5px; }
+
+.content { padding: 24px 28px 48px; display: flex; flex-direction: column; gap: 22px; }
+
+/* ---------------- Stat tiles ---------------- */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.stat-tile {
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px 18px;
+  box-shadow: var(--shadow-card);
+}
+.stat-tile .label { font-size: 12.5px; color: var(--text-secondary); font-weight: 500; }
+.stat-tile .value { font-size: 26px; font-weight: 650; margin-top: 6px; letter-spacing: -0.01em; }
+.stat-tile .row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.delta { font-size: 12.5px; font-weight: 650; display: inline-flex; align-items: center; gap: 3px; }
+.delta.up-bad { color: var(--status-critical); }
+.delta.up-good { color: var(--status-good-text); }
+.delta.flat { color: var(--text-muted); }
+.stat-tile .spark { flex: 1; height: 26px; }
+
+/* ---------------- Cards ---------------- */
+.card {
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
+}
+.card-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 18px 20px 6px; gap: 12px;
+}
+.card-head h2 { font-size: 15px; font-weight: 650; margin: 0; }
+.card-head p { font-size: 12.5px; color: var(--text-secondary); margin: 3px 0 0; }
+.card-body { padding: 8px 20px 20px; }
+
+.seg-control {
+  display: inline-flex; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 999px; padding: 3px; gap: 2px;
+}
+.seg-control button {
+  border: none; background: transparent; padding: 6px 12px;
+  border-radius: 999px; font-size: 12.5px; font-weight: 600; color: var(--text-secondary);
+  cursor: pointer;
+}
+.seg-control button.active { background: var(--surface-1); color: var(--text-primary); box-shadow: 0 1px 2px rgba(11,11,11,0.10); }
+
+/* two-column layout */
+.grid-2 { display: grid; grid-template-columns: 1.55fr 1fr; gap: 18px; align-items: start; }
+
+/* Legend */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 0 20px 16px; }
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-secondary); font-weight: 500; }
+.legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+/* Provider breakdown list */
+.provider-list { display: flex; flex-direction: column; gap: 14px; }
+
+/* Cost by service / Cost by tag: both cards hold one fixed height and scroll
+   their own contents.
+   Without this the two sit side by side at wildly different heights — services
+   runs to twenty rows while a tag slide is five — which left a tall column of
+   dead space beside the shorter one and pushed everything below the fold. */
+#breakdown-section .card { height: 560px; display: flex; flex-direction: column; }
+#breakdown-section .card-head { flex: none; }
+/* min-height:0 is what actually lets a flex child shrink enough to scroll; without
+   it the body grows to its content and the card silently overflows instead. */
+#breakdown-section .card-body {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+}
+#breakdown-section #service-list { flex: 1; min-height: 0; overflow-y: auto; }
+#breakdown-section #tag-list {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+}
+/* Room for the scrollbar so it never sits on top of the percentage figures. */
+#breakdown-section #service-list,
+#breakdown-section .tag-slides { padding-right: 4px; }
+
+@media (max-width: 1100px) {
+  /* Stacked single column — a fixed height here would scroll the cards inside a
+     page that is already scrolling, so let them size to their content again. */
+  #breakdown-section .card { height: auto; }
+  #breakdown-section .card-body,
+  #breakdown-section #service-list,
+  #breakdown-section #tag-list,
+  #breakdown-section .tag-slides { overflow: visible; }
+}
+
+/* Cost-by-tag slider: one tag key per slide, stepped with the nav below. */
+.tag-slides { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; }
+.tag-slide { display: flex; flex-direction: column; gap: 14px; }
+.tag-slide[hidden] { display: none; }
+/* Pinned below the scroll area, not inside it: with a long key the nav would
+   otherwise scroll out of reach and the only way to change slide would be to
+   scroll back down for the buttons. */
+.tag-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-top: 16px; flex: none;
+  padding-top: 14px; border-top: 1px solid var(--border);
+}
+.tag-nav-count { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); }
+.tag-nav .seg-control button { min-width: 34px; font-size: 15px; line-height: 1; }
+.tag-nav .seg-control button:disabled { opacity: .35; cursor: default; }
+.provider-row { display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 10px; border-radius: var(--radius-sm); padding: 6px; margin: -6px; }
+a.provider-row:hover { background: var(--surface-2); }
+a.provider-row:hover .provider-meta { color: var(--brand); }
+.provider-dot { width: 10px; height: 10px; border-radius: 3px; }
+.provider-name { font-size: 13px; font-weight: 600; }
+.provider-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+.provider-amt { text-align: right; font-variant-numeric: tabular-nums; font-weight: 650; font-size: 13.5px; }
+.provider-amt .pct { display: block; font-size: 11px; color: var(--text-muted); font-weight: 500; }
+.provider-bar-track { grid-column: 1 / -1; height: 6px; border-radius: 999px; background: var(--gridline); overflow: hidden; }
+.provider-bar-fill { height: 100%; border-radius: 999px; }
+
+/* Table */
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th {
+  text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--text-muted); font-weight: 650; padding: 0 12px 10px; border-bottom: 1px solid var(--gridline);
+}
+.table td { padding: 12px; border-bottom: 1px solid var(--gridline); vertical-align: middle; }
+.table tbody tr:last-child td { border-bottom: none; }
+.table tbody tr:hover { background: var(--surface-2); }
+.table .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.svc-cell { display: flex; align-items: center; gap: 10px; }
+.svc-ic {
+  width: 28px; height: 28px; border-radius: 8px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: #fff;
+}
+.svc-name { font-weight: 600; }
+.svc-sub { font-size: 11.5px; color: var(--text-muted); }
+
+.badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 650; padding: 3px 9px; border-radius: 999px; }
+.badge .ic { width: 12px; height: 12px; }
+.badge-critical { background: #fbe9e8; color: #8f1f1f; }
+.badge-serious  { background: #fdece3; color: #8a3b1c; }
+.badge-warning  { background: #fef3da; color: #7a4e02; }
+.badge-good     { background: #e6f7e6; color: var(--status-good-text); }
+.badge-neutral  { background: var(--surface-2); color: var(--text-secondary); border: 1px solid var(--border); }
+
+/* Alerts preview list (dashboard card) */
+.alert-mini { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--gridline); }
+.alert-mini:last-child { border-bottom: none; padding-bottom: 0; }
+.alert-mini .stripe { width: 3px; border-radius: 3px; flex: none; align-self: stretch; }
+.alert-mini .body { flex: 1; min-width: 0; }
+.alert-mini .title { font-size: 13px; font-weight: 650; }
+.alert-mini .meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+.alert-mini .amt { font-size: 13px; font-weight: 700; color: var(--status-critical); white-space: nowrap; }
+
+.footer-link-row { display: flex; justify-content: flex-end; padding: 4px 20px 16px; }
+.link-btn { font-size: 12.5px; font-weight: 650; color: var(--brand); }
+.link-btn:hover { text-decoration: underline; }
+
+/* Chart tooltip */
+#trend-chart { position: relative; }
+.chart-tooltip {
+  position: absolute; top: 6px;
+  background: var(--sidebar-bg); color: #fff;
+  border-radius: var(--radius-sm); padding: 10px 12px;
+  font-size: 12px; pointer-events: none; transition: opacity 0.08s ease;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.24); min-width: 168px; z-index: 4;
+}
+.chart-tooltip .tt-head { font-weight: 700; margin-bottom: 6px; color: #fff; }
+.chart-tooltip .tt-row { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
+.chart-tooltip .tt-dot { width: 8px; height: 8px; border-radius: 999px; flex: none; }
+.chart-tooltip .tt-name { flex: 1; color: #c7cedb; }
+.chart-tooltip .tt-val { font-weight: 650; font-variant-numeric: tabular-nums; }
+
+/* ---------------- Alerts page ---------------- */
+.filter-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.select {
+  font-size: 13px; font-weight: 600; color: var(--text-primary);
+  background: var(--surface-1); border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm); padding: 8px 30px 8px 12px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%2352514e'/></svg>");
+  background-repeat: no-repeat; background-position: right 12px center;
+}
+.channel-key { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+.channel-key .ck-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+.channel-key .ck-ic { width: 15px; height: 15px; opacity: 0.75; }
+
+/* minmax(0,…) rather than a bare 1fr: an fr track will not shrink below its
+   content's minimum, so the detail panel used to push the list column
+   narrower whenever the selected alert had wider content — the list was
+   ~700px for one alert and ~345px for another in the same window. The ratio
+   is now fixed and the list is the same width whichever alert is open. */
+.alerts-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 18px; align-items: start; }
+
+.alert-list { display: flex; flex-direction: column; gap: 10px; }
+.alert-card {
+  display: grid; grid-template-columns: 4px 1fr; gap: 12px;
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius-md);
+  cursor: pointer; overflow: hidden; box-shadow: var(--shadow-card);
+}
+.alert-card .stripe { background: var(--status-critical); }
+/* min-width:0 so the grid track can actually squeeze it — without it the
+   truncation below never engages and a long account name pushes the impact
+   figure off the edge of the card instead. */
+.alert-card .inner { padding: 13px 16px 13px 2px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.alert-card.selected { outline: 2px solid var(--brand); outline-offset: -1px; }
+/* Every row in this card is one line, fixed height, and identical whether the
+   alert is read or unread. Long account names and long titles truncate instead
+   of wrapping, so no card can be taller than its neighbours and opening one
+   cannot move the cards below it. */
+.alert-card .top-row { display: flex; align-items: center; gap: 8px; justify-content: space-between; min-width: 0; }
+.alert-card .sev-slot { display: inline-flex; align-items: center; gap: 6px; flex: none; }
+.alert-card .provider-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 650; color: var(--text-secondary); min-width: 0; }
+.alert-card .provider-tag .sq { width: 9px; height: 9px; border-radius: 3px; flex: none; }
+.alert-card .provider-tag .pt-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.alert-card .card-title {
+  font-size: 13.5px; font-weight: 650; line-height: 1.35;
+  /* Exactly two lines, always: the unread weight below changes how the text
+     wraps, and without a fixed box that reflow resizes the card on click. */
+  height: calc(2 * 1.35em);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.alert-card.unread .card-title { font-weight: 750; }
+.unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); flex: none; }
+/* Read once, revised since. Deliberately quieter than an unread alert — it
+   asks to be looked at again, it is not new. */
+.badge-updated { background: var(--surface-2); color: var(--text-secondary); border: 1px solid var(--border-strong); font-size: 10.5px; padding: 2px 7px; }
+
+/* An alert whose problem stopped recurring. Deliberately the quietest badge
+   on the card — it marks something that needs less attention, not more, and a
+   loud colour here would compete with the severity badge beside it. */
+.badge-quiet {
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.alert-card.updated .card-title { font-weight: 700; }
+.updated-note { font-size: 12px; color: var(--text-muted); font-weight: 500; white-space: nowrap; }
+/* Read alerts keep the dot's space so the row's width budget never changes. */
+.alert-card:not(.unread) .unread-dot { visibility: hidden; }
+.alert-card .card-meta { font-size: 11.5px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.alert-card .card-impact { font-size: 13px; font-weight: 700; white-space: nowrap; flex: none; }
+.alert-card .card-impact.neutral { color: var(--text-muted); font-weight: 600; }
+
+/* Now that the column no longer widens to fit, anything unusually long has to
+   wrap inside the panel rather than overflow it. */
+.detail-panel { position: sticky; top: 86px; min-width: 0; overflow-wrap: anywhere; }
+.detail-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px 22px 4px; gap: 12px; }
+.detail-title { font-size: 17px; font-weight: 650; margin: 8px 0 4px; letter-spacing: -0.01em; }
+.detail-meta-row { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--text-secondary); flex-wrap: wrap; }
+.detail-meta-row .sq { width: 9px; height: 9px; border-radius: 3px; margin-right: 4px; }
+
+/* Flex, not a fixed 3-column grid: the strip carries 3 cells or 4 depending on
+   whether the alert has an "Actually spent since" figure. At 3 columns the 4th
+   cell dropped to a second row on its own, and the two empty grid slots beside
+   it showed the strip's gridline background as a grey block. */
+.impact-strip { display: flex; gap: 1px; background: var(--gridline); margin: 16px 22px 0; border-radius: var(--radius-sm); overflow: hidden; }
+.impact-cell { background: var(--surface-1); padding: 12px 14px; flex: 1 1 0; min-width: 0; }
+.impact-cell .l { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+.impact-cell .v { font-size: 16px; font-weight: 700; margin-top: 3px; }
+
+.detail-section { padding: 18px 22px 0; }
+.detail-section h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); font-weight: 700; margin: 0 0 8px; }
+.detail-section p { font-size: 13.5px; line-height: 1.55; color: var(--text-primary); margin: 0; }
+.detail-section p.muted { color: var(--text-secondary); }
+
+.chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 650; padding: 6px 11px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text-secondary); }
+.chip.on { background: var(--brand-wash); border-color: rgba(42,120,214,0.35); color: var(--brand-dark); }
+.chip .ic { width: 13px; height: 13px; }
+
+/* ---------------- Accounts page ---------------- */
+.accounts-group { scroll-margin-top: 90px; }
+/* ---------------- Collapsible sections ----------------
+   Native <details>/<summary>, so keyboard, screen readers and find-in-page
+   all work without any JS keeping track of open state. */
+.collapse > summary {
+  cursor: pointer; list-style: none;
+  border-radius: var(--radius-lg);
+}
+.collapse > summary::-webkit-details-marker { display: none; }
+.collapse > summary:hover { background: var(--surface-2); }
+.collapse > summary:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+.collapse[open] > summary { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.collapse-chevron {
+  flex: none; margin-left: 10px; color: var(--text-muted);
+  transition: transform 0.15s ease;
+}
+.collapse[open] .collapse-chevron { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) { .collapse-chevron { transition: none; } }
+
+/* Reveals the rest of a long list in place, rather than making the page
+   longer than anyone wants to scroll before they've asked for it. */
+.show-more-row {
+  padding: 11px 20px; border-top: 1px solid var(--gridline);
+  display: flex; justify-content: center;
+}
+.show-more-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 12.5px; font-weight: 650; color: var(--brand); padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}
+.show-more-btn:hover { background: var(--surface-2); }
+
+.accounts-group-head { display: flex; align-items: center; gap: 14px; padding: 16px 20px; }
+.provider-badge-lg {
+  width: 38px; height: 38px; border-radius: 10px; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex: none;
+}
+.accounts-group-head .g-name { font-size: 15px; font-weight: 700; }
+.accounts-group-head .g-meta { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.accounts-group-head .g-total { margin-left: auto; text-align: right; }
+.accounts-group-head .g-total .v { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.accounts-group-head .g-total .l { font-size: 11px; color: var(--text-muted); }
+
+/* Each row is its own grid, so `auto` columns size to that row's own content
+   and the amounts land at a different x in every row. Fixed widths for the
+   two variable-length cells (spend, sync) keep the columns lined up. */
+.account-row {
+  display: grid; grid-template-columns: 1fr 110px 130px auto auto; gap: 16px; align-items: center;
+  padding: 13px 20px; border-top: 1px solid var(--gridline);
+  color: inherit; text-decoration: none; cursor: pointer;
+}
+.account-row:hover { background: var(--surface-2); }
+
+/* The row is no longer an <a> — the name inside it has to be a button so it
+   can open the rename dialog, and a button nested in a link is neither valid
+   nor clickable in the way either control wants. Instead an empty link is
+   stretched over the whole row, so clicking anywhere still opens the account
+   while the name and Remove sit above it. */
+.acc-row-link { position: absolute; inset: 0; z-index: 0; }
+.account-row .acc-name { font-size: 13.5px; font-weight: 650; }
+.acc-name-btn {
+  font: inherit; font-size: 13.5px; font-weight: 650;
+  color: inherit; background: none; border: 0; padding: 0; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; text-align: left;
+  border-radius: var(--radius-sm);
+  position: relative; z-index: 1;
+}
+.acc-name-btn .ic-edit { width: 12.5px; height: 12.5px; flex: none; opacity: 0; transition: opacity 0.12s; }
+.account-row:hover .acc-name-btn .ic-edit,
+.acc-name-btn:focus-visible .ic-edit { opacity: 0.5; }
+.acc-name-btn:hover { text-decoration: underline; text-underline-offset: 2px; }
+.account-row .acc-id { font-size: 11.5px; color: var(--text-muted); font-variant-numeric: tabular-nums; margin-top: 1px; }
+.account-row .acc-owner-sep { opacity: 0.55; }
+.link-btn-sm { font-size: 12px; font-weight: 650; color: var(--brand); background: none; border: 0; padding: 0; cursor: pointer; }
+.link-btn-sm:hover { text-decoration: underline; }
+.field-input-sm { width: auto; min-width: 240px; padding: 6px 9px; font-size: 12.5px; }
+.acc-owner-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 3px; }
+.acc-meta .acc-owner-value { color: var(--text-primary); }
+.acc-owner-label { color: var(--text-muted); }
+.acc-owner-value { color: var(--text-secondary); font-weight: 600; }
+.acc-owner-edit { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.acc-owner-edit .acc-owner-label { white-space: nowrap; }
+.acc-owner-error { color: var(--status-critical); font-size: 12px; }
+.acc-unassigned { color: var(--text-muted); font-weight: 500; }
+.status-pill-empty { display: block; }
+
+/* Pulling cost data costs money per call, so the control says what it will do
+   and then says what happened — never a bare button that silently no-ops. */
+.btn-refresh { gap: 7px; padding: 7px 12px; font-size: 12.5px; color: var(--text-secondary); white-space: nowrap; }
+.btn-refresh:hover:not(:disabled) { background: var(--surface-2); border-color: var(--brand); color: var(--brand); }
+.btn-refresh:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-refresh .ic { width: 14px; height: 14px; flex: none; }
+.btn-refresh.is-busy .ic { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .btn-refresh.is-busy .ic { animation: none; } }
+.refresh-note { font-size: 12px; color: var(--text-secondary); max-width: 260px; text-align: right; line-height: 1.35; }
+.refresh-note.is-error { color: var(--status-critical); }
+.acc-stale-manager {
+  font-size: 11px; font-weight: 650; color: #8a5a00;
+  background: #fff6e0; border: 1px solid rgba(250,178,25,0.45);
+  border-radius: 999px; padding: 1px 7px; font-variant-numeric: normal;
+  white-space: nowrap;
+}
+.account-row .acc-owner { font-variant-numeric: normal; }
+.account-row .acc-spend { font-size: 13.5px; font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; }
+.account-row .acc-sync { font-size: 11.5px; color: var(--text-muted); text-align: right; white-space: nowrap; }
+.account-row .acc-chevron { color: var(--text-muted); font-size: 16px; line-height: 1; }
+a.account-row:hover .acc-chevron { color: var(--brand); }
+.status-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 650; color: var(--status-good-text); background: #eafaea; border: 1px solid rgba(12,163,12,0.25); border-radius: 999px; padding: 4px 9px; white-space: nowrap; }
+.status-pill .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--status-good); }
+.status-pill.pending { color: #8a6100; background: #fef3da; border-color: rgba(250,178,25,0.35); }
+.status-pill.pending .dot { background: var(--status-warning); animation: pulse 1.4s infinite; }
+.account-row.is-pending { background: #fffdf6; }
+/* ---------------- Danger zone (irreversible actions) ---------------- */
+.danger-card { border-color: rgba(208, 59, 59, 0.35); }
+.danger-card .card-head h2 { color: var(--status-critical); }
+.danger-list { margin: 0 0 12px; padding-left: 20px; font-size: 13px; color: var(--text-secondary); }
+.danger-list li { margin-bottom: 4px; }
+.danger-warning {
+  font-size: 13px; font-weight: 600; color: var(--status-critical);
+  background: #fdeeee; border: 1px solid rgba(208, 59, 59, 0.25);
+  border-radius: 8px; padding: 10px 12px; margin: 0;
+}
+.btn-danger { background: var(--status-critical); color: #fff; border-color: var(--status-critical); }
+.btn-danger:hover:not([disabled]) { filter: brightness(0.92); }
+.btn-danger[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* The row itself is an <a>, so the delete control sits alongside it rather
+   than nested inside (a button inside an anchor is invalid and swallows clicks). */
+.account-row-outer { position: relative; }
+.account-row-outer .account-row { padding-right: 92px; }
+.acc-delete {
+  position: absolute; right: 38px; top: 50%; transform: translateY(-50%);
+  font-size: 12px; font-weight: 650; color: var(--status-critical);
+  background: none; border: none; cursor: pointer; padding: 4px 6px; white-space: nowrap;
+  /* Above the stretched link below, or the row would swallow the click. */
+  z-index: 1;
+}
+.acc-delete:hover { text-decoration: underline; }
+.acc-delete[disabled] { opacity: .5; cursor: default; text-decoration: none; }
+
+.add-account-row { padding: 13px 20px; border-top: 1px solid var(--gridline); }
+
+/* ---------------- Trial banner ---------------- */
+.trial-banner { background: var(--brand-wash); border-bottom: 1px solid rgba(42,120,214,0.20); }
+.trial-banner-inner { display: flex; align-items: center; gap: 12px; padding: 10px 28px; }
+.trial-ic { font-size: 16px; flex: none; }
+.trial-text { font-size: 13px; color: var(--brand-dark); line-height: 1.4; }
+.trial-text strong { font-weight: 700; }
+.trial-banner-inner .btn { flex: none; margin-left: auto; }
+.trial-close { flex: none; background: none; border: none; color: var(--brand-dark); opacity: 0.6; cursor: pointer; font-size: 13px; padding: 4px; }
+.trial-close:hover { opacity: 1; }
+
+/* Paused data refreshes — same bar geometry as the trial banner so the two
+   occupy the identical slot, in the alert palette rather than the brand one:
+   this is something to act on, not an offer. */
+.sync-banner { background: #fdece3; border-bottom: 1px solid rgba(236,131,90,0.35); }
+.sync-banner-inner { display: flex; align-items: center; gap: 12px; padding: 10px 28px; }
+.sync-banner-ic { font-size: 16px; flex: none; color: #8a3b1c; }
+.sync-banner-text { font-size: 13px; color: #8a3b1c; line-height: 1.4; }
+/* The lead carries the whole message for anyone who reads one line and moves
+   on, so it gets its own line and a deeper red than the explanation under it —
+   the two ran together as one paragraph and the state was easy to skim past. */
+.sync-banner-text strong { display: block; color: #9b1c1c; font-weight: 750; }
+.sync-banner-inner .btn { flex: none; margin-left: auto; }
+
+/* Approaching expiry, not past it. Orange rather than the alert red: nothing
+   has stopped working yet, and spending the stronger colour now would leave
+   nothing louder for the day refreshes actually pause.
+   Warmer and more saturated than the expired banner's peach so the two read as
+   different states at a glance, not just different words. Contrast on the
+   background is 5.8:1 for the lead and 4.6:1 for the body — both past AA. */
+.sync-banner.is-expiring { background: #fdeacd; border-bottom-color: rgba(234,140,42,0.45); }
+.sync-banner.is-expiring .sync-banner-ic,
+.sync-banner.is-expiring .sync-banner-text { color: #9a5a12; }
+.sync-banner.is-expiring .sync-banner-text strong { color: #8a4a05; }
+
+/* What a connected WhatsApp number is used for. Indented under its channel row
+   so it reads as a property of that channel rather than a separate setting. */
+/* Which message goes by which route.
+ *
+ * A grid rather than a list of tickboxes: the question is two-dimensional —
+ * two kinds of message against two channels — and any flat arrangement makes
+ * the reader hold one axis in their head. The columns are fixed-width so the
+ * ticks line up under their headings on every row. */
+.delivery {
+  margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--gridline);
+}
+.delivery-head, .delivery-row {
+  /* One column per channel. Narrower than the original 84px now that there
+     are three of them, so the label keeps its room on a laptop. */
+  display: grid; grid-template-columns: minmax(0, 1fr) 72px 72px 72px; align-items: center;
+}
+.delivery-head {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--text-muted); padding-bottom: 8px; border-bottom: 1px solid var(--gridline);
+}
+.delivery-head span + span, .delivery-row .c { text-align: center; }
+.delivery-row { padding: 12px 0; border-bottom: 1px solid var(--gridline); }
+.delivery-row:last-child { border-bottom: none; }
+.delivery-row .n { display: block; font-size: 13.5px; font-weight: 600; }
+.delivery-row .d { display: block; font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+/* When the digest goes out, which used to be a card of its own. It gets room
+   to breathe from the line above it, and wraps rather than pushing the tick
+   columns around. */
+.delivery-row #digest-timing { margin-top: 5px; line-height: 1.45; }
+.delivery-row #digest-timing a { color: var(--brand); }
+.delivery-row input { width: 16px; height: 16px; accent-color: var(--brand); cursor: pointer; }
+.delivery-row input:disabled { cursor: not-allowed; opacity: 0.45; }
+
+/* Spans the whole row so the sentence has room to be a sentence. Silence is
+   allowed here, so this has to explain rather than scold. */
+.delivery-warn {
+  grid-column: 1 / -1; margin: 8px 0 0;
+  font-size: 12px; line-height: 1.45;
+  /* The same amber pair the warning badges use, which clears AA on this
+     background — this is a state to notice, not an error to fix. */
+  color: #7a4e02; background: #fef3da;
+  border-radius: var(--radius-sm); padding: 7px 10px;
+}
+
+
+/* Read-only while billing is unresolved.
+ *
+ * Keyed off data-sync-status on <html>, set by auth-guard beside data-role, so
+ * this works the same way .role-write already does — by CSS alone, with no
+ * render function needing to know about subscriptions. The server refuses all
+ * of these regardless; this only stops someone filling in a form before being
+ * told no.
+ *
+ * Deliberately NOT listed: the payment buttons and Close account (how a tenant
+ * renews, or leaves), the account-detail Refresh button (already answers with
+ * its own explanation), and every read control on Dashboard and Alerts. */
+:root[data-sync-status="expired"] .role-write,
+:root[data-sync-status="payment_failed"] .role-write,
+:root[data-sync-status="expired"] #invite-btn,
+:root[data-sync-status="payment_failed"] #invite-btn,
+:root[data-sync-status="expired"] #monitor-save-btn,
+:root[data-sync-status="payment_failed"] #monitor-save-btn,
+:root[data-sync-status="expired"] #timezone-save-btn,
+:root[data-sync-status="payment_failed"] #timezone-save-btn,
+:root[data-sync-status="expired"] #currency-save-btn,
+:root[data-sync-status="payment_failed"] #currency-save-btn,
+:root[data-sync-status="expired"] #anomaly-save-btn,
+:root[data-sync-status="payment_failed"] #anomaly-save-btn,
+:root[data-sync-status="expired"] #org-save-btn,
+:root[data-sync-status="payment_failed"] #org-save-btn,
+:root[data-sync-status="expired"] #address-save-btn,
+:root[data-sync-status="payment_failed"] #address-save-btn,
+:root[data-sync-status="expired"] #whatsapp-connect-btn,
+:root[data-sync-status="payment_failed"] #whatsapp-connect-btn,
+:root[data-sync-status="expired"] #wa-send-code-btn,
+:root[data-sync-status="payment_failed"] #wa-send-code-btn,
+:root[data-sync-status="expired"] #wa-verify-btn,
+:root[data-sync-status="payment_failed"] #wa-verify-btn,
+:root[data-sync-status="expired"] [data-role-select],
+:root[data-sync-status="payment_failed"] [data-role-select],
+:root[data-sync-status="expired"] [data-remove-member],
+:root[data-sync-status="payment_failed"] [data-remove-member],
+:root[data-sync-status="expired"] [data-edit-scope],
+:root[data-sync-status="payment_failed"] [data-edit-scope],
+:root[data-sync-status="expired"] #member-accounts-list input[type="checkbox"],
+:root[data-sync-status="payment_failed"] #member-accounts-list input[type="checkbox"] {
+  pointer-events: none;
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(100%);
+}
+
+@media (max-width: 1100px) {
+  .alerts-split { grid-template-columns: 1fr; }
+  .detail-panel { position: static; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .account-row { grid-template-columns: 1fr auto; row-gap: 4px; }
+  .account-row .acc-region, .account-row .acc-sync { display: none; }
+  .account-row-outer .account-row { padding-right: 80px; }
+}
+
+/* ---------------- Auth (login) page ---------------- */
+.auth-shell {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background:
+    radial-gradient(720px 420px at 12% -10%, rgba(57,135,229,0.16), transparent 60%),
+    radial-gradient(680px 420px at 105% 15%, rgba(27,175,122,0.14), transparent 60%),
+    var(--sidebar-bg);
+  padding: 24px;
+}
+.auth-card {
+  width: 100%; max-width: 380px;
+  background: var(--surface-1);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.45);
+  padding: 32px 30px 28px;
+}
+.auth-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; width: fit-content; transition: opacity 0.12s; }
+.auth-brand:hover { opacity: 0.75; }
+.auth-brand .mark { width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg,#3987e5,#1baf7a); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 14px; }
+.auth-brand .name { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.auth-brand .tag { font-size: 11px; color: var(--text-muted); display: block; margin-top: -1px; }
+
+.auth-tabs {
+  display: flex; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 999px; padding: 3px; gap: 2px; margin-bottom: 16px;
+}
+.auth-tabs button {
+  flex: 1; border: none; background: transparent; padding: 8px 14px; border-radius: 999px;
+  font-size: 13px; font-weight: 650; color: var(--text-secondary); cursor: pointer;
+}
+.auth-tabs button.active { background: var(--surface-1); color: var(--text-primary); box-shadow: 0 1px 2px rgba(11,11,11,0.10); }
+
+.auth-badge {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 650;
+  color: var(--brand-dark); background: var(--brand-wash); border: 1px solid rgba(42,120,214,0.25);
+  border-radius: 999px; padding: 4px 10px; margin-bottom: 14px;
+}
+.auth-badge .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--brand); }
+
+.auth-step h1 { font-size: 19px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
+.auth-step p.sub { font-size: 13px; color: var(--text-secondary); margin: 0 0 20px; line-height: 1.5; }
+.auth-step p.sub strong { color: var(--text-primary); font-weight: 650; }
+
+.field-label { font-size: 12px; font-weight: 650; color: var(--text-secondary); margin-bottom: 6px; display: block; }
+.field-optional { font-weight: 500; color: var(--text-muted); text-transform: none; letter-spacing: 0; }
+.field-hint { font-size: 12px; color: var(--text-muted); margin: 6px 0 0; line-height: 1.45; }
+.field-input {
+  width: 100%; font-size: 14px; padding: 11px 13px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong); background: var(--surface-1); color: var(--text-primary);
+  /* Fixed so a <select> and an <input> line up. Identical padding does not
+     give identical heights: browsers add their own internal metrics to a
+     select, so it rendered a couple of pixels taller than the field beside it
+     — visible wherever the two share a row, which on this page is most of
+     them. 42px is the 24px of padding and border plus room for 14px text. */
+  height: 42px; line-height: 1.3;
+}
+.field-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(42,120,214,0.15); }
+/* Shown, not editable — the derived refresh interval and the exchange-rate
+   source. Without this they were indistinguishable from a field you could
+   type into, so people clicked and nothing happened. */
+.field-input[readonly] {
+  background: var(--surface-2); color: var(--text-secondary);
+  border-color: var(--border); cursor: default;
+}
+.field-input[readonly]:focus { border-color: var(--border); box-shadow: none; }
+.field-error { font-size: 12px; color: var(--status-critical); margin-top: 6px; display: none; font-weight: 600; }
+.field-error.show { display: block; }
+
+.btn-block { width: 100%; justify-content: center; padding: 11px 14px; font-size: 13.5px; margin-top: 16px; }
+
+.otp-row { display: flex; gap: 8px; margin-top: 4px; }
+.otp-box {
+  width: 100%; aspect-ratio: 1; text-align: center; font-size: 19px; font-weight: 700;
+  border-radius: var(--radius-sm); border: 1px solid var(--border-strong); color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.otp-box:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(42,120,214,0.15); }
+
+.auth-links { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
+.auth-links button { background: none; border: none; padding: 0; font-size: 12.5px; font-weight: 650; color: var(--brand); cursor: pointer; }
+.auth-links button:disabled { color: var(--text-muted); cursor: default; }
+.auth-links .back-link { font-size: 12.5px; font-weight: 650; color: var(--text-secondary); background: none; border: none; cursor: pointer; padding: 0; }
+
+.demo-note {
+  margin-top: 18px; font-size: 11.5px; color: var(--text-muted); background: var(--surface-2);
+  border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); padding: 9px 11px; line-height: 1.45;
+}
+.demo-note strong { color: var(--text-secondary); }
+
+.auth-toast {
+  display: none; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 650;
+  color: var(--status-good-text); background: #eafaea; border: 1px solid rgba(12,163,12,0.25);
+  border-radius: var(--radius-sm); padding: 9px 11px; margin-bottom: 16px;
+}
+.auth-toast.show { display: flex; }
+
+.auth-step { display: none; }
+.auth-step.active { display: block; }
+
+/* ---------------- Add Cloud Account modal ---------------- */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(11,11,11,0.5);
+  align-items: center; justify-content: center; padding: 24px;
+}
+.modal-overlay.show { display: flex; }
+.modal-card {
+  width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto;
+  background: var(--surface-1); border-radius: var(--radius-lg);
+  box-shadow: 0 40px 80px -20px rgba(0,0,0,0.45);
+  padding: 30px 32px 32px; position: relative;
+}
+.modal-close {
+  position: absolute; top: 18px; right: 18px; width: 30px; height: 30px; border-radius: 999px;
+  background: var(--surface-2); border: 1px solid var(--border); color: var(--text-secondary);
+  cursor: pointer; font-size: 13px;
+}
+.modal-close:hover { background: var(--border); }
+.modal-step { display: none; }
+.modal-step.active { display: block; }
+.modal-step-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--brand); margin-bottom: 8px; }
+.modal-step h2 { font-size: 19px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
+.modal-sub { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 0 0 20px; }
+.modal-back { background: none; border: none; padding: 0; font-size: 12.5px; font-weight: 650; color: var(--text-secondary); cursor: pointer; margin-bottom: 10px; }
+.modal-back:hover { color: var(--brand); }
+
+.provider-pick-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.provider-pick-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 14px;
+  background: var(--surface-1); cursor: pointer; text-align: left;
+}
+.provider-pick-card:hover { border-color: var(--brand); background: var(--brand-wash); }
+.provider-pick-card .ppc-name { font-size: 13.5px; font-weight: 650; color: var(--text-primary); }
+.provider-pick-card .ppc-meta { font-size: 11.5px; color: var(--text-muted); }
+/* Second line on a provider card — says what the card is for when a
+   connected-count would be meaningless. */
+.ppc-sub { font-size: 11.5px; color: var(--text-secondary); line-height: 1.35; margin-top: 1px; }
+
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.code-block { position: relative; background: var(--sidebar-bg); border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 8px; }
+.code-block pre {
+  margin: 0; color: #c7cedb; font-size: 12px; line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+.code-copy {
+  position: absolute; top: 10px; right: 10px; font-size: 11px; font-weight: 650;
+  color: #c7cedb; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 6px; padding: 4px 9px; cursor: pointer;
+}
+.code-copy:hover { background: rgba(255,255,255,0.16); }
+
+.connecting-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 10px; gap: 18px; text-align: center; }
+.spinner { width: 34px; height: 34px; border-radius: 999px; border: 3px solid var(--gridline); border-top-color: var(--brand); animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.connecting-text { font-size: 13.5px; font-weight: 600; color: var(--text-secondary); }
+
+.success-state { text-align: center; padding: 8px 6px 0; }
+.success-check {
+  width: 52px; height: 52px; border-radius: 999px; background: #eafaea; color: var(--status-good-text);
+  display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800;
+  margin: 0 auto 16px;
+}
+.success-state h2 { font-size: 18px; }
+.success-state .modal-sub { margin-bottom: 16px; }
+.success-state .demo-note { margin-bottom: 20px; }
+.success-actions { display: flex; gap: 10px; }
+.success-actions .btn { flex: 1; justify-content: center; }
+
+@media (max-width: 640px) {
+  .provider-pick-grid { grid-template-columns: 1fr; }
+  .form-grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ---------------- Billing & Plan page ---------------- */
+.trial-card {
+  display: grid; grid-template-columns: 1fr 1px 1.1fr; gap: 0;
+  background: linear-gradient(135deg, #101a2c, #16233a);
+  border-radius: var(--radius-lg); color: #fff; overflow: hidden;
+}
+.trial-card-main { padding: 26px 28px; }
+.trial-badge {
+  display: inline-flex; align-items: center; font-size: 11px; font-weight: 700;
+  color: #9ec5f4; background: rgba(57,135,229,0.16); border: 1px solid rgba(57,135,229,0.32);
+  border-radius: 999px; padding: 4px 10px; margin-bottom: 12px;
+}
+/* Lapsed: the same badge in the alert palette, so the card agrees with the
+   banner above it instead of still reading as a live trial. */
+.trial-badge.is-expired {
+  color: #f7c3ab; background: rgba(236,131,90,0.18); border-color: rgba(236,131,90,0.40);
+}
+.trial-days { font-size: 30px; font-weight: 750; letter-spacing: -0.02em; }
+.trial-sub { font-size: 13px; color: #aab4c6; margin-top: 6px; }
+.trial-sub strong { color: #fff; font-weight: 650; }
+.trial-progress-track { height: 6px; border-radius: 999px; background: rgba(255,255,255,0.12); margin-top: 16px; overflow: hidden; }
+.trial-progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #3987e5, #1baf7a); }
+.trial-card-divider { background: rgba(255,255,255,0.10); }
+.trial-card-usage { padding: 26px 28px; display: flex; flex-direction: column; gap: 12px; }
+.tcu-row { display: flex; align-items: center; justify-content: space-between; }
+.tcu-label { font-size: 12.5px; color: #aab4c6; }
+.tcu-value { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tcu-recommend {
+  margin-top: 6px; font-size: 12.5px; line-height: 1.55; color: #dbe3f0;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10);
+  border-radius: var(--radius-sm); padding: 11px 13px;
+}
+.tcu-recommend strong { color: #fff; }
+
+.plans-head { margin-top: 6px; }
+.plans-head h2 { font-size: 18px; font-weight: 700; margin: 0 0 6px; letter-spacing: -0.01em; }
+.plans-head p { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin: 0; max-width: 780px; }
+.plans-head strong { color: var(--text-primary); }
+
+.plan-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; align-items: stretch; }
+.plan-grid-3 { grid-template-columns: repeat(3, 1fr); max-width: 920px; }
+.plan-card {
+  position: relative; background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 22px 20px 20px; box-shadow: var(--shadow-card);
+  display: flex; flex-direction: column;
+}
+.plan-card.featured { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand), var(--shadow-card); }
+.plan-card.recommended { border-color: var(--status-good); box-shadow: 0 0 0 1px var(--status-good), var(--shadow-card); }
+.plan-card.is-selected { outline: 2px solid var(--brand); outline-offset: 2px; }
+.plan-ribbon {
+  position: absolute; top: -11px; left: 20px; font-size: 10.5px; font-weight: 750; text-transform: uppercase;
+  letter-spacing: 0.03em; color: #fff; background: var(--brand); border-radius: 999px; padding: 4px 10px;
+}
+.plan-ribbon.ribbon-recommend { background: var(--status-good); }
+.plan-name { font-size: 14px; font-weight: 700; color: var(--text-secondary); margin-bottom: 10px; }
+.plan-price { display: flex; align-items: baseline; gap: 7px; }
+.plan-price .orig { font-size: 14px; color: var(--text-muted); text-decoration: line-through; }
+.plan-price .now { font-size: 27px; font-weight: 750; letter-spacing: -0.02em; color: var(--text-primary); }
+.plan-price .per { font-size: 12.5px; color: var(--text-muted); font-weight: 600; }
+/* Sits directly under the headline figure, which is quoted tax-inclusive. */
+.plan-tax { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+/* The observed figure leads; the projection sits under it, clearly secondary. */
+.alert-mini .amt { display: flex; flex-direction: column; align-items: flex-end; }
+.alert-mini .amt-unit { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-left: 1px; }
+.alert-mini .amt-note { font-size: 11px; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+.impact-note { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+.plan-cap { font-size: 12px; color: var(--text-secondary); margin-top: 6px; min-height: 32px; }
+.plan-cap strong { color: var(--text-primary); }
+.plan-features { list-style: none; margin: 16px 0 20px; padding: 0; display: flex; flex-direction: column; gap: 9px; flex: 1; }
+.plan-features li { font-size: 12.5px; color: var(--text-primary); padding-left: 20px; position: relative; line-height: 1.4; }
+.plan-features li::before { content: "✓"; position: absolute; left: 0; top: 0; color: var(--status-good-text); font-weight: 800; font-size: 11px; }
+.plan-cta { width: 100%; justify-content: center; text-align: center; }
+
+.selected-plan-note {
+  display: none; font-size: 13px; line-height: 1.5; color: var(--status-good-text);
+  background: #eafaea; border: 1px solid rgba(12,163,12,0.25); border-radius: var(--radius-md);
+  padding: 13px 16px;
+}
+.selected-plan-note.show { display: block; }
+.selected-plan-note strong { font-weight: 700; }
+
+.how-it-works { padding-top: 6px; }
+.how-it-works h3 { font-size: 14px; font-weight: 700; margin: 0 0 16px; }
+.hiw-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.hiw-step { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; }
+.hiw-num {
+  display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px;
+  border-radius: 999px; background: var(--brand-wash); color: var(--brand-dark); font-size: 12px; font-weight: 750; margin-bottom: 10px;
+}
+.hiw-t { font-size: 13.5px; font-weight: 650; margin-bottom: 4px; }
+.hiw-s { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+@media (max-width: 1200px) {
+  .plan-grid { grid-template-columns: repeat(2, 1fr); }
+  .plan-grid-3 { grid-template-columns: repeat(2, 1fr); max-width: none; }
+}
+@media (max-width: 1100px) {
+  .trial-card { grid-template-columns: 1fr; }
+  .trial-card-divider { display: none; }
+  .hiw-steps { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .plan-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------------- Settings page ---------------- */
+.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 18px; }
+.settings-grid .span-2 { grid-column: 1 / -1; }
+.settings-grid .optional { font-weight: 500; color: var(--text-muted); text-transform: none; letter-spacing: normal; }
+
+.plans-currency-note {
+  font-size: 12.5px; color: var(--text-secondary); margin-top: 8px;
+  padding: 8px 12px; border-radius: var(--radius-sm);
+  background: var(--surface-2); border: 1px solid var(--border);
+}
+
+.settings-save-row { display: flex; align-items: center; gap: 12px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--gridline); }
+.save-confirm { font-size: 12.5px; font-weight: 650; color: var(--status-good-text); opacity: 0; transition: opacity 0.15s; }
+.save-confirm.show { opacity: 1; }
+
+.payment-row { display: flex; align-items: center; gap: 16px; }
+.payment-card-visual {
+  width: 52px; height: 40px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; color: var(--text-muted); flex: none;
+}
+.payment-info { flex: 1; min-width: 0; }
+.payment-brand { font-size: 13.5px; font-weight: 650; }
+.payment-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+/* ---------------- Role-based access (Owner / Admin / Member) ---------------- */
+/* [data-role] is set on <html> by auth-guard.js. Hide owner-only nav/actions for
+   admin & member, and hide write actions (add/modify/delete) for read-only members. */
+[data-role="admin"] .role-owner-only,
+[data-role="member"] .role-owner-only { display: none !important; }
+[data-role="member"] .role-write { display: none !important; }
+/* Owner and Admin, but not Member — Settings is operational, so an Admin needs
+   it; closing the CloudMeter account inside it stays .role-owner-only. */
+[data-role="member"] .role-manage-only { display: none !important; }
+
+.role-badge {
+  display: inline-flex; align-items: center; font-size: 11px; font-weight: 700;
+  border-radius: 999px; padding: 3px 9px; text-transform: capitalize;
+}
+.role-badge-owner { color: var(--brand-dark); background: var(--brand-wash); border: 1px solid rgba(42,120,214,0.25); }
+.role-badge-admin { color: #7a4e02; background: #fef3da; border: 1px solid rgba(250,178,25,0.35); }
+.role-badge-member { color: var(--text-secondary); background: var(--surface-2); border: 1px solid var(--border-strong); }
+
+.readonly-banner {
+  display: none; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600;
+  color: var(--text-secondary); background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 4px;
+}
+[data-role="member"] .readonly-banner { display: flex; }
+/* Hidden where it would contradict a control beside it — an empty workspace
+   offers a Member the one account they may create. The plain `hidden`
+   attribute loses to the rule above, so it needs saying here. */
+.readonly-banner[hidden] { display: none; }
+
+/* ---------------- Team page ---------------- */
+.member-row { display: grid; grid-template-columns: auto 1fr auto auto auto; gap: 14px; align-items: center; padding: 14px 20px; border-top: 1px solid var(--gridline); }
+.member-row:first-child { border-top: none; }
+.member-avatar { width: 34px; height: 34px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--text-secondary); flex: none; }
+.member-info .name { font-size: 13.5px; font-weight: 650; display: flex; align-items: center; gap: 7px; }
+.member-info .email { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.member-you-tag { font-size: 10.5px; font-weight: 700; color: var(--text-muted); background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 1px 7px; }
+/* The name doubles as the rename control, so it must still read as a name:
+   inherited type, no chrome, and the pencil only on hover or keyboard focus. */
+.member-name-btn { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-align: left; border-radius: var(--radius-sm); }
+.member-name-btn .ic-edit { width: 12.5px; height: 12.5px; flex: none; opacity: 0; transition: opacity 0.12s; }
+.member-row:hover .member-name-btn .ic-edit,
+.member-name-btn:focus-visible .ic-edit { opacity: 0.5; }
+.member-name-btn:hover { text-decoration: underline; text-underline-offset: 2px; }
+.member-meta { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.member-role-select { font-size: 12.5px; font-weight: 600; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface-1); color: var(--text-primary); }
+.member-remove-btn { font-size: 12px; font-weight: 650; color: var(--status-critical); background: none; border: none; cursor: pointer; padding: 4px 6px; white-space: nowrap; }
+.member-remove-btn:hover { text-decoration: underline; }
+.badge-pending { background: #fef3da; color: #7a4e02; border: 1px solid rgba(250,178,25,0.35); }
+
+.invite-form { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.invite-form .field-group { flex: 1; min-width: 220px; }
+.invite-form .field-group.role-field { flex: none; min-width: 140px; }
+
+.role-explain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.role-explain-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; }
+.role-explain-card h4 { font-size: 13px; font-weight: 700; margin: 0 0 6px; display: flex; align-items: center; gap: 8px; }
+.role-explain-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin: 0; }
+
+.preview-switcher-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+@media (max-width: 900px) {
+  .member-row { grid-template-columns: auto 1fr; row-gap: 8px; }
+  .member-meta, .member-role-select, .member-remove-btn { grid-column: 2; }
+  .role-explain-grid { grid-template-columns: 1fr; }
+}
+
+/* ---------------- Notifications page ---------------- */
+.channel-row { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-top: 1px solid var(--gridline); }
+.channel-row:first-child { border-top: none; padding-top: 0; }
+.channel-icon-visual {
+  width: 40px; height: 40px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; color: var(--text-secondary); flex: none;
+}
+.channel-icon-visual svg { width: 19px; height: 19px; }
+.channel-info { flex: 1; min-width: 0; }
+.channel-info .name { font-size: 13.5px; font-weight: 650; }
+.channel-info .status { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+/* The workspace-level Slack install, under the channel rows. A sentence with
+   a link in it rather than a second button on the row: it is a different kind
+   of action from "connect me", and one an Owner does once. */
+.channel-note { font-size: 12px; color: var(--text-secondary); margin: 2px 0 0; line-height: 1.5; }
+.channel-note .linkish {
+  background: none; border: none; padding: 0; font: inherit; color: var(--brand);
+  font-weight: 600; cursor: pointer; text-decoration: underline;
+}
+.channel-note .linkish:hover { color: var(--brand-dark); }
+.channel-note.is-good { color: var(--text-secondary); }
+.channel-info .status.connected { color: var(--status-good-text); }
+
+.toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; flex: none; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-slider { position: absolute; inset: 0; background: var(--gridline); border-radius: 999px; cursor: pointer; transition: background 0.15s; }
+.toggle-slider::before { content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 999px; transition: transform 0.15s; box-shadow: 0 1px 2px rgba(0,0,0,0.25); }
+.toggle-switch input:checked + .toggle-slider { background: var(--brand); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+.toggle-row { display: flex; align-items: center; gap: 12px; }
+.toggle-row .toggle-label { font-size: 13.5px; font-weight: 650; }
+
+.channel-check-list { display: flex; gap: 20px; flex-wrap: wrap; }
+.channel-check { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-primary); cursor: pointer; }
+.channel-check input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--brand); }
+.channel-check.disabled { color: var(--text-muted); cursor: default; }
+.channel-check.disabled input { cursor: default; }
+.channel-check .hint { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+.rule-fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 18px; margin-bottom: 18px; }
+.input-prefix-group { position: relative; }
+.input-prefix-group .prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--text-muted); font-weight: 600; pointer-events: none; }
+.input-prefix-group input { padding-left: 24px; }
+
+/* ---------------- 6-month cost comparison (account detail) ---------------- */
+.month-compare-stats { display: flex; gap: 32px; margin-bottom: 20px; flex-wrap: wrap; }
+.mcs-item .l { font-size: 11.5px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+.mcs-item .v { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.mcs-item .delta { font-size: 15px; font-weight: 700; }
+.monthly-chart-box { position: relative; }
+
+/* ---------------- One day's services, under the daily chart ----------------
+   The daily rows have always stored a per-service breakdown; nothing read it.
+   This is where a spike gets a cause: on AL STARK, 5 Oct was $317 of which
+   DynamoDB was $297.78. Hidden until a bar is clicked, so the card keeps its
+   height for accounts nobody drills into. */
+.day-detail-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 16px; margin-top: 18px; padding-top: 14px;
+  border-top: 1px solid var(--gridline);
+}
+.day-detail-head .muted { font-size: 12px; margin-top: 2px; }
+/* Which days a comparison column covers, written under its heading. This was
+   a hover tooltip first; the dates are the first thing anyone wants from the
+   table, and nothing on screen said the words could be hovered. */
+.col-window {
+  display: block; margin-top: 3px;
+  font-size: 11px; font-weight: 400; letter-spacing: 0;
+  color: var(--text-muted); text-transform: none; white-space: nowrap;
+}
+
+.day-detail-right { display: flex; align-items: center; gap: 10px; }
+.day-detail-total { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+/* Putting the panel away. Inline rather than the absolutely positioned
+   .modal-close, since this sits in a card's flow and not over a dialog. */
+.day-detail-close {
+  width: 26px; height: 26px; flex: none; border-radius: 999px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  color: var(--text-secondary); cursor: pointer; font-size: 12px; line-height: 1;
+}
+.day-detail-close:hover { background: var(--border); color: var(--text-primary); }
+.day-detail-head .badge { margin-left: 8px; vertical-align: 2px; }
+.day-detail-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+.day-detail-table th {
+  font-weight: 500; font-size: 11.5px; color: var(--text-muted);
+  text-align: left; padding-bottom: 6px;
+}
+.day-detail-table td { padding: 7px 0; border-top: 1px solid var(--gridline); }
+/* Figures line up for scanning down a column; names truncate rather than
+   pushing the numbers off the right edge. */
+.day-detail-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.day-detail-table td:first-child {
+  max-width: 0; width: 46%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.day-detail-table .delta { font-size: 12.5px; }
+.month-tooltip {
+  position: absolute; top: 0;
+  background: var(--sidebar-bg); color: #fff;
+  border-radius: var(--radius-sm); padding: 8px 11px;
+  font-size: 12px; pointer-events: none; transition: opacity 0.08s ease;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.24); white-space: nowrap; z-index: 4;
+}
+
+/* ---------------- Service drill-down (clickable service rows + modal) ---------------- */
+.provider-row.clickable { cursor: pointer; }
+.provider-row.clickable:hover { background: var(--surface-2); }
+.provider-row.clickable:hover .provider-name { color: var(--brand); }
+.provider-row.clickable:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+.provider-amt .row-chevron { margin-left: 6px; color: var(--text-muted); font-size: 14px; vertical-align: middle; }
+.provider-row.clickable:hover .row-chevron { color: var(--brand); }
+
+.service-modal-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 16px; padding-right: 24px; }
+.service-modal-head h2 { font-size: 17px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+.service-modal-head .modal-sub { margin: 2px 0 0; }
+.service-modal-head .provider-dot { margin-top: 6px; flex: none; }
+.service-modal-head .delta { font-size: 13px; font-weight: 700; white-space: nowrap; }
+
+/* ---- Pricing comparison ---- */
+/* Grid rather than a table: the same columns have to collapse to two lines on
+   a phone, which a <table> fights. */
+.price-table { border-top: 1px solid var(--gridline); }
+.price-row {
+  display: grid; align-items: center; gap: 12px;
+  grid-template-columns: minmax(120px, 1fr) minmax(0, 1.6fr) 110px 62px 96px;
+  padding: 11px 18px; border-bottom: 1px solid var(--gridline); font-size: 13px;
+}
+.price-row:last-child { border-bottom: 0; }
+/* The cheapest row is the answer most people came for, so it is marked in the
+   layout rather than left to be worked out from the numbers. */
+.price-row.is-cheapest { background: var(--brand-wash); }
+.price-row .p-provider { display: inline-flex; align-items: center; gap: 8px; font-weight: 650; }
+.price-row .p-provider .sq { width: 9px; height: 9px; border-radius: 3px; flex: none; }
+.price-row .p-sku { color: var(--text-secondary); display: flex; flex-direction: column; gap: 2px; }
+.price-row .p-sku .d { font-size: 11.5px; color: var(--text-muted); }
+.price-row .p-price { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.price-row .p-rel { font-size: 11.5px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.cheapest-tag { font-size: 10.5px; font-weight: 700; color: var(--status-good-text); }
+.price-row .p-source { text-align: right; }
+.src-live { font-size: 10.5px; font-weight: 700; color: var(--status-good-text); background: #eafaea; border: 1px solid rgba(12,163,12,0.25); border-radius: 999px; padding: 1px 8px; }
+.src-curated { font-size: 10.5px; font-weight: 650; color: var(--text-muted); background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+.price-row .p-source a { text-decoration: none; }
+.price-row .p-source a:hover .src-curated { color: var(--brand); border-color: var(--brand); }
+
+@media (max-width: 860px) {
+  .price-row { grid-template-columns: 1fr auto auto; row-gap: 4px; }
+  .price-row .p-sku { grid-column: 1 / -1; order: 3; }
+  .price-row .p-source { grid-column: 1 / -1; order: 4; text-align: left; }
+}
+
+/* "+ Create a new CloudMeter account" — a distinct action, not another account
+   in the list, so it sits below a rule rather than reading as a fourth tenant. */
+.account-switcher-new {
+  display: block; width: 100%; text-align: left;
+  font-size: 12.5px; font-weight: 650; color: var(--brand);
+  background: none; border: 0; border-top: 1px solid var(--gridline);
+  padding: 10px 14px; margin-top: 4px; cursor: pointer;
+}
+.account-switcher-new:hover { background: var(--surface-2); }
+
+/* Shown in place of "+ Create a new CloudMeter account" once the person already
+   owns one — explaining the rule beats hiding the option and leaving them to
+   wonder where it went. */
+.account-switcher-note {
+  font-size: 11.5px; line-height: 1.45; color: var(--text-muted);
+  border-top: 1px solid var(--gridline); padding: 10px 14px; margin-top: 4px;
+}
+
+/* Adhoc Spent — the hand-entered subscriptions card.
+   ------------------------------------------------------------------
+   Its own row style rather than .provider-row: a subscription carries
+   four facts (who, when, how often, how much) where a service row
+   carries two, and squeezing them into a bar-chart row made the amount
+   compete with the bar for the same attention. */
+.adhoc-list { display: flex; flex-direction: column; }
+.adhoc-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 13px 2px; border-bottom: 1px solid var(--gridline);
+}
+.adhoc-row:last-child { border-bottom: 0; }
+.adhoc-main { flex: 1 1 auto; min-width: 0; }
+.adhoc-name {
+  font-size: 13.5px; font-weight: 650; color: var(--text-primary);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.adhoc-type {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--text-secondary); background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 999px; padding: 1px 7px;
+}
+.adhoc-flag {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  color: #8a5a00; background: rgba(214,158,46,0.13);
+  border: 1px solid rgba(214,158,46,0.35); border-radius: 999px; padding: 1px 7px;
+}
+.adhoc-meta {
+  font-size: 11.5px; color: var(--text-secondary); margin-top: 3px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.adhoc-sep { color: var(--text-muted); opacity: 0.6; margin: 0 5px; }
+/* A line that this month carries none of is greyed rather than struck through:
+   the cost is real, it just landed in a different month. */
+.adhoc-row.is-uncounted .adhoc-name,
+.adhoc-row.is-uncounted .adhoc-amt-value { color: var(--text-secondary); }
+.adhoc-amt { text-align: right; flex: none; }
+.adhoc-amt-value { font-size: 13.5px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.adhoc-amt-note { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.adhoc-actions { display: flex; gap: 6px; flex: none; }
+.btn-danger-ghost {
+  color: var(--status-critical); border-color: var(--border); background: transparent;
+}
+.btn-danger-ghost:hover:not([disabled]) {
+  background: var(--status-critical); border-color: var(--status-critical); color: #fff;
+}
+.adhoc-review {
+  font-size: 12.5px; line-height: 1.5; color: #8a5a00;
+  background: rgba(214,158,46,0.10); border: 1px solid rgba(214,158,46,0.30);
+  border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 14px;
+}
+.adhoc-empty { padding: 28px 8px; text-align: center; }
+.adhoc-empty p { margin: 0 0 6px; font-size: 13.5px; }
+.adhoc-empty p.muted { font-size: 12.5px; max-width: 420px; margin: 0 auto; }
+
+/* The add / edit dialog. */
+.adhoc-modal { width: min(520px, calc(100vw - 32px)); }
+.adhoc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.adhoc-type-switch { display: inline-flex; margin-top: 2px; }
+.adhoc-sub-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.adhoc-sub-row .field-input { flex: 1 1 auto; min-width: 0; }
+.adhoc-sub-row [data-sub-remove] { flex: none; line-height: 1; padding: 7px 11px; }
+@media (max-width: 560px) {
+  .adhoc-grid { grid-template-columns: 1fr; }
+  .adhoc-row { flex-wrap: wrap; }
+  .adhoc-actions { width: 100%; justify-content: flex-end; }
+}
+
+/* The plan fields follow the tool name directly. They had a labelled rule
+   above them; the hint line already says what they are, and the rule was one
+   more thing to read on a screen that is mostly fields. */
+#aa-adhoc-block { margin-top: 18px; }
+
+/* The cloud-vs-adhoc split under the month-to-date figure. Carries two real
+   amounts, so it reads at full strength rather than as a footnote — tabular
+   figures keep the two columns of digits aligned as they change. */
+.stat-split-row { margin-top: 4px; }
+.stat-split {
+  font-size: 12.5px; font-weight: 700; color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A listbox standing in for a <select>.
+   ------------------------------------------------------------------
+   Native option elements are drawn by the browser and ignore almost all
+   CSS, so a price could only be appended to the label after a dash —
+   which left a ragged column that got worse the more plans a tool sold.
+   This is the same control with the layout under our control: name on
+   the left, price hard right, note beneath. */
+.cm-select { position: relative; }
+.cm-select-btn {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; font: inherit; font-size: 13.5px; text-align: left;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface-1); color: var(--text-primary); cursor: pointer;
+}
+.cm-select-btn:hover { border-color: var(--text-muted); }
+.cm-select-btn:focus-visible,
+.cm-select.is-open .cm-select-btn { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(42,120,214,0.16); }
+.cm-select-value { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cm-select-chev { width: 15px; height: 15px; flex: none; color: var(--text-muted); transition: transform .15s ease; }
+.cm-select.is-open .cm-select-chev { transform: rotate(180deg); }
+
+/*
+ * In the flow, for the same reason the tool picker is.
+ *
+ * This list lives in the adhoc Add/Edit dialog, which is opened with
+ * showModal() — and a modal <dialog> is given `overflow-y: auto` and
+ * `max-height: calc(100% - 38px)` by the browser itself. That makes it a
+ * scroll container, and a scroll container clips absolutely positioned
+ * descendants: on a short window the dialog overflows and the plan list is
+ * cut off at its edge with the last plans unreachable. Scrolling the dialog
+ * does get there, but a wheel over the list spends itself on the list's own
+ * 260px box first, so it feels stuck.
+ *
+ * Sitting in the flow it takes real space, the dialog grows, and its own
+ * scrollbar reaches the end. The fields below move down while it is open and
+ * back when it closes, which is honest about a list that is genuinely part of
+ * the form.
+ */
+.cm-select-list {
+  margin: 4px 0 0; padding: 4px; list-style: none;
+  /*
+   * Deliberately no max-height and no overflow of its own.
+   *
+   * Keeping the old 260px scrollbox made it worse rather than better: a
+   * nested scroller with a few pixels of travel swallows the wheel, so
+   * scrolling over the list moved it six pixels and then stopped, while the
+   * dialog behind it never moved at all. Measured — dialogScrollTop stayed 0
+   * through a five-tick scroll.
+   *
+   * One scroller is the fix. The dialog already caps itself and scrolls; the
+   * list simply makes it taller, and the whole list is reachable with the
+   * gesture people already use.
+   */
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.cm-option {
+  display: grid; grid-template-columns: 1fr auto; align-items: baseline;
+  column-gap: 14px; padding: 8px 10px; border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 13.5px;
+}
+.cm-option-name { font-weight: 550; color: var(--text-primary); }
+/* Tabular figures so the column of prices lines up digit for digit. */
+.cm-option-price {
+  font-variant-numeric: tabular-nums; color: var(--text-secondary);
+  font-size: 12.5px; white-space: nowrap;
+}
+.cm-option-note {
+  grid-column: 1 / -1; font-size: 11.5px; color: var(--text-muted); margin-top: 1px;
+}
+.cm-option.is-active { background: var(--surface-2); }
+.cm-option.is-selected .cm-option-name { color: var(--brand); font-weight: 650; }
+.cm-option.is-other { border-top: 1px solid var(--gridline); margin-top: 4px; padding-top: 10px; }
+.cm-option.is-other .cm-option-name { color: var(--text-secondary); font-weight: 500; }
+
+/* "Still paying?" — an open-ended line nobody has confirmed in months. Blue
+   rather than the amber of "Ended": nothing is wrong with it, it is a question
+   about whether it should still be there. */
+.adhoc-flag.is-checkin {
+  color: var(--brand); background: rgba(42,120,214,0.10);
+  border-color: rgba(42,120,214,0.30);
+}
+.adhoc-review div + div { margin-top: 6px; }
+
+/* Scope-based nav (org-wide vs a Member scoped to specific cloud accounts).
+   [data-scope] is set on <html> by auth-guard.js — "account" before paint, then
+   confirmed or relaxed once /me returns. Hiding these by CSS rather than in JS
+   is deliberate: JS can only run after that round trip, so the links a Member
+   cannot use were on screen for its whole duration, on every page they opened. */
+[data-scope="account"] a.nav-link[href$="dashboard.html"],
+[data-scope="account"] a.nav-link[href$="team.html"] { display: none !important; }
+
+/* The way back from a provider-scoped Accounts page. A quiet line of text:
+   the group below already names the provider in a larger size, so anything
+   heavier competes with the content it is introducing. */
+.provider-filter-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin: 0 0 14px; padding: 0;
+  background: none; border: 0; cursor: pointer;
+  font-size: 13px; font-weight: 500; color: var(--text-secondary);
+}
+.provider-filter-back:hover { color: var(--brand); }
+
+/* "Next payment" on Billing. Razorpay's checkout leaves its own next-due field
+   blank — no second cycle exists until the mandate is authorised — so this is
+   the first place the date is real. */
+.next-payment {
+  display: grid; grid-template-columns: auto 1fr; gap: 2px 14px;
+  align-items: baseline; margin: 18px 0 0;
+  padding: 14px 16px; border: 1px solid var(--border);
+  border-radius: var(--radius-md); background: var(--surface-1);
+}
+.next-payment-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-muted); white-space: nowrap;
+}
+.next-payment-value {
+  font-size: 15px; font-weight: 650; color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.next-payment-note {
+  grid-column: 2; font-size: 12px; color: var(--text-secondary);
+}
+@media (max-width: 560px) {
+  .next-payment { grid-template-columns: 1fr; }
+  .next-payment-note { grid-column: 1; }
+}
+
+/* Cost by model — each project a collapsed <details>, opening into its models.
+   Native disclosure rather than a hand-rolled chevron, for the same reasons
+   the accounts groups use it: keyboard, screen readers and find-in-page work. */
+.by-model-project { border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface-1); }
+.by-model-project + .by-model-project { margin-top: 8px; }
+.by-model-summary {
+  display: flex; align-items: center; gap: 10px; padding: 11px 14px;
+  cursor: pointer; list-style: none; font-size: 13.5px;
+}
+.by-model-summary::-webkit-details-marker { display: none; }
+.by-model-summary::before {
+  content: ''; width: 6px; height: 6px; flex: none;
+  border-right: 1.8px solid var(--text-muted); border-bottom: 1.8px solid var(--text-muted);
+  transform: rotate(-45deg); transition: transform .15s ease;
+}
+.by-model-project[open] > .by-model-summary::before { transform: rotate(45deg); }
+.by-model-summary:hover { background: var(--surface-2); }
+.by-model-summary:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+.by-model-summary .sq { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.by-model-name { font-weight: 600; flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.by-model-meta { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.by-model-amt { font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.by-model-amt .pct { display: block; font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+.by-model-rows { padding: 4px 14px 12px 40px; display: flex; flex-direction: column; gap: 4px; }
+.by-model-row { display: grid; grid-template-columns: minmax(0, 1fr) 120px 76px 84px; gap: 12px; align-items: center; font-size: 12.5px; }
+.by-model-row.clickable { cursor: pointer; padding: 4px 6px; margin: 0 -6px; border-radius: var(--radius-sm); }
+.by-model-row.clickable:hover { background: var(--surface-2); }
+.by-model-row.clickable:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; }
+.by-model-row .row-chevron { color: var(--text-muted); margin-left: 6px; }
+/* The same colours the service card used for its trend line. */
+.by-model-trend { font-size: 11.5px; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
+.by-model-trend.up { color: var(--status-critical); }
+.by-model-trend.down { color: var(--status-good); }
+.by-model-trend.flat { color: var(--text-muted); }
+.by-model-model { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-secondary); }
+.by-model-track { height: 6px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+.by-model-fill { display: block; height: 100%; border-radius: 3px; }
+.by-model-model-amt { text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 560px) {
+  .by-model-row { grid-template-columns: minmax(0, 1fr) 64px; }
+  .by-model-track, .by-model-trend { display: none; }
+  .by-model-rows { padding-left: 14px; }
+}
+
+/* A cost filled from the plan rather than typed. readOnly, not disabled: a
+   disabled input is skipped by form reads and greys out past legibility. */
+.field-input.is-locked { background: var(--surface-2); color: var(--text-secondary); cursor: not-allowed; }
+
+/* ---- Add Account: searchable tool picker --------------------------------
+   A <select> cannot match a tool's "Also known as" names — its type-ahead
+   only jumps to labels starting with what you typed — so this is a text box
+   with its own list beneath it. */
+.tool-picker { position: relative; }
+/*
+ * In the flow, not floating above it.
+ *
+ * The first version was absolutely positioned, which looked right and was
+ * unusable: .modal-card scrolls (max-height: 88vh; overflow-y: auto), and a
+ * scroll container clips absolutely positioned descendants. The list was cut
+ * off at the card's edge with no way to reach the tools below — a dropdown
+ * showing two of eight entries.
+ *
+ * Sitting in the flow, it takes real space, the card grows, and the card's
+ * own scrollbar reaches the rest. The inner max-height keeps a long catalogue
+ * from filling the dialog; that inner scroll works now precisely because
+ * nothing is clipping it.
+ */
+.tool-picker-list {
+  margin: 6px 0 0; padding: 4px; list-style: none;
+  max-height: 240px; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-lg);
+}
+.tool-opt {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  padding: 8px 10px; border-radius: 6px; cursor: pointer;
+}
+.tool-opt:hover, .tool-opt.is-active { background: var(--brand-wash); }
+.tool-opt-name { font-size: 14px; color: var(--text-primary); }
+/* The aliases, so the reader can see why a search for "openai" surfaced
+   ChatGPT. Secondary on purpose: the tool's real name is what is being
+   chosen. */
+.tool-opt-alias { font-size: 11.5px; color: var(--text-muted); }
+.tool-opt.is-other { border-top: 1px solid var(--gridline); margin-top: 4px; padding-top: 10px; }

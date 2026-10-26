@@ -1,0 +1,216 @@
+/* ===========================================================
+   CloudMeter — marketing homepage (index.html only)
+   =========================================================== */
+
+.mkt-body { background: var(--surface-1); }
+
+/* ---- Nav ---- */
+.mkt-nav {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 32px; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.mkt-nav-brand { display: flex; align-items: center; gap: 9px; }
+.mkt-nav-brand .mark { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg,#3987e5,#1baf7a); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 13px; }
+.mkt-nav-brand .name { font-size: 15px; font-weight: 750; color: var(--text-primary); letter-spacing: -0.01em; }
+.mkt-nav-links { display: flex; align-items: center; gap: 28px; }
+.mkt-nav-links a { font-size: 13.5px; font-weight: 600; color: var(--text-secondary); }
+.mkt-nav-links a:hover { color: var(--text-primary); }
+.mkt-nav-actions { display: flex; align-items: center; gap: 10px; }
+.mkt-nav-toggle { display: none; }
+
+/* ---- Hero ---- */
+.mkt-hero {
+  position: relative; overflow: hidden;
+  padding: 76px 32px 64px;
+  background:
+    radial-gradient(680px 380px at 85% -8%, rgba(57,135,229,0.10), transparent 60%),
+    radial-gradient(600px 360px at -5% 20%, rgba(27,175,122,0.08), transparent 60%);
+}
+.mkt-hero-inner { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+.mkt-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700;
+  color: var(--brand-dark); background: var(--brand-wash); border: 1px solid rgba(42,120,214,0.22);
+  border-radius: 999px; padding: 5px 12px; margin-bottom: 18px;
+}
+.mkt-eyebrow .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--brand); }
+.mkt-hero h1 { font-size: 44px; line-height: 1.1; font-weight: 780; letter-spacing: -0.02em; margin: 0 0 18px; color: var(--text-primary); }
+.mkt-hero h1 .accent { color: var(--brand); }
+.mkt-hero-sub { font-size: 16.5px; line-height: 1.6; color: var(--text-secondary); max-width: 520px; margin: 0 0 28px; }
+.mkt-hero-ctas { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.mkt-hero-ctas .btn { padding: 13px 22px; font-size: 14.5px; }
+.mkt-hero-note { font-size: 12.5px; color: var(--text-muted); margin-top: 14px; }
+
+/* ---- Hero product visual ---- */
+.mkt-browser {
+  border-radius: 16px; background: var(--surface-1); border: 1px solid var(--border);
+  box-shadow: 0 40px 80px -30px rgba(11,11,11,0.28), 0 4px 14px rgba(11,11,11,0.06);
+  overflow: hidden; transform: perspective(1400px) rotateY(-4deg) rotateX(1deg);
+}
+.mkt-browser-bar { display: flex; align-items: center; gap: 8px; padding: 11px 14px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+.mkt-browser-dot { width: 9px; height: 9px; border-radius: 999px; background: var(--gridline); }
+.mkt-browser-url { flex: 1; margin-left: 8px; font-size: 11px; color: var(--text-muted); background: var(--surface-1); border: 1px solid var(--border); border-radius: 999px; padding: 4px 12px; }
+.mkt-browser-body { padding: 18px; }
+
+/* Promo video in the hero. The iframe host is allowed by the www site's CSP
+   frame-src (FrontendStack) and nowhere else. */
+.mkt-hero-video {
+  position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden;
+  background: #0b0b0b; border: 1px solid var(--border);
+  box-shadow: 0 40px 80px -30px rgba(11,11,11,0.28), 0 4px 14px rgba(11,11,11,0.06);
+}
+.mkt-hero-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+.mkt-mini-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.mkt-mini-topbar .t { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.mkt-mini-topbar .chips { display: flex; }
+.mkt-mini-topbar .chips span { width: 18px; height: 18px; border-radius: 999px; border: 1.5px solid var(--surface-1); margin-left: -6px; font-size: 7px; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+
+.mkt-mini-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.mkt-mini-stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+.mkt-mini-stat .l { font-size: 9.5px; color: var(--text-muted); font-weight: 600; }
+.mkt-mini-stat .v { font-size: 15px; font-weight: 750; margin-top: 2px; }
+.mkt-mini-stat .d { font-size: 9.5px; font-weight: 700; color: var(--status-critical); margin-top: 2px; }
+
+.mkt-mini-chart { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px 6px; margin-bottom: 10px; }
+.mkt-mini-chart .l { font-size: 9.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+
+.mkt-mini-alert { display: flex; align-items: center; gap: 8px; background: #fdecec; border: 1px solid rgba(208,59,59,0.2); border-radius: 10px; padding: 9px 11px; }
+.mkt-mini-alert .ic { font-size: 13px; }
+.mkt-mini-alert .t { font-size: 10.5px; font-weight: 700; color: #8f1f1f; }
+.mkt-mini-alert .s { font-size: 9.5px; color: #8f1f1f; opacity: 0.75; }
+.mkt-mini-alert .amt { margin-left: auto; font-size: 11px; font-weight: 800; color: var(--status-critical); }
+
+/* ---- Trust / stats strip ---- */
+.mkt-stats-strip {
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface-2);
+}
+.mkt-stats-strip-inner {
+  max-width: 1180px; margin: 0 auto; padding: 22px 32px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center;
+}
+.mkt-stat-item .v { font-size: 22px; font-weight: 780; color: var(--text-primary); letter-spacing: -0.01em; }
+.mkt-stat-item .l { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+
+/* ---- Generic section shell ---- */
+.mkt-section { padding: 88px 32px; }
+.mkt-section-inner { max-width: 1180px; margin: 0 auto; }
+.mkt-section-head { max-width: 640px; margin: 0 0 48px; }
+.mkt-section-head.center { margin-left: auto; margin-right: auto; text-align: center; }
+.mkt-section-head h2 { font-size: 32px; font-weight: 780; letter-spacing: -0.02em; margin: 10px 0 12px; color: var(--text-primary); }
+.mkt-section-head p { font-size: 15.5px; line-height: 1.6; color: var(--text-secondary); }
+.mkt-section-alt { background: var(--surface-2); }
+
+/* ---- Problem grid ---- */
+.mkt-problem-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.mkt-problem-card {
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 26px 24px; box-shadow: var(--shadow-card);
+}
+.mkt-problem-card .ic {
+  width: 42px; height: 42px; border-radius: 11px; background: #fdecec; color: var(--status-critical);
+  display: flex; align-items: center; justify-content: center; font-size: 19px; margin-bottom: 16px;
+}
+.mkt-problem-card h3 { font-size: 16px; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.01em; }
+.mkt-problem-card p { font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+
+/* ---- Feature grid ---- */
+.mkt-feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.mkt-feature-card {
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 26px 24px;
+}
+.mkt-feature-card .ic {
+  width: 42px; height: 42px; border-radius: 11px; background: var(--brand-wash); color: var(--brand);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+}
+.mkt-feature-card .ic svg { width: 21px; height: 21px; }
+.mkt-feature-card h3 { font-size: 15.5px; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.01em; }
+.mkt-feature-card p { font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+
+/* ---- Steps (reuses .hiw-* base from styles.css, scoped bigger here) ---- */
+.mkt-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: step; }
+.mkt-step { position: relative; padding-left: 4px; }
+.mkt-step .num {
+  display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px;
+  border-radius: 999px; background: var(--brand); color: #fff; font-size: 14px; font-weight: 750; margin-bottom: 16px;
+}
+.mkt-step h3 { font-size: 15.5px; font-weight: 700; margin: 0 0 8px; }
+.mkt-step p { font-size: 13.5px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+.mkt-step-line { position: absolute; top: 17px; left: calc(100% - 4px); width: calc(20px + 4px); height: 2px; background: var(--gridline); }
+
+/* ---- Pricing preview (reuses .plan-card etc. from styles.css) ---- */
+.mkt-pricing-foot { text-align: center; margin-top: 28px; font-size: 13px; color: var(--text-secondary); }
+.mkt-pricing-foot a { color: var(--brand); font-weight: 650; }
+
+/* ---- Security strip ---- */
+.mkt-security { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+.mkt-security-points { display: flex; flex-direction: column; gap: 18px; }
+.mkt-security-point { display: flex; gap: 14px; }
+.mkt-security-point .ic {
+  width: 36px; height: 36px; border-radius: 10px; background: #eafaea; color: var(--status-good-text);
+  display: flex; align-items: center; justify-content: center; flex: none;
+}
+.mkt-security-point .ic svg { width: 18px; height: 18px; }
+.mkt-security-point h4 { font-size: 14.5px; font-weight: 700; margin: 0 0 4px; }
+.mkt-security-point p { font-size: 13px; line-height: 1.55; color: var(--text-secondary); margin: 0; }
+
+.mkt-security-visual {
+  background: var(--sidebar-bg); border-radius: var(--radius-lg); padding: 28px; color: #fff;
+}
+.mkt-security-visual .diagram-row { display: flex; align-items: center; justify-content: space-between; }
+.mkt-security-visual .provider-col { display: flex; flex-direction: column; gap: 8px; }
+.mkt-security-visual .provider-chip-lg {
+  display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 650; color: #c7cedb;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); border-radius: 8px; padding: 6px 10px;
+}
+.mkt-security-visual .provider-chip-lg .sq { width: 8px; height: 8px; border-radius: 2px; }
+.mkt-security-visual .arrow { color: #6d7891; font-size: 20px; }
+.mkt-security-visual .engine-box {
+  text-align: center; font-size: 11.5px; font-weight: 700; color: #fff;
+  background: rgba(57,135,229,0.16); border: 1px solid rgba(57,135,229,0.35);
+  border-radius: 10px; padding: 14px 16px;
+}
+.mkt-security-visual .engine-box .sub { font-size: 10px; font-weight: 500; color: #9aa7bd; margin-top: 3px; }
+.mkt-security-visual .lock-note { display: flex; align-items: center; gap: 8px; margin-top: 18px; font-size: 11.5px; color: #9ec5f4; font-weight: 650; }
+
+/* ---- Final CTA banner ---- */
+.mkt-cta-banner {
+  background: linear-gradient(135deg, #101a2c, #16233a); color: #fff;
+  padding: 72px 32px; text-align: center;
+}
+.mkt-cta-banner h2 { font-size: 30px; font-weight: 780; letter-spacing: -0.02em; margin: 0 0 12px; }
+.mkt-cta-banner p { font-size: 15px; color: #aab4c6; margin: 0 0 30px; }
+.mkt-cta-banner .btn { padding: 13px 26px; font-size: 14.5px; }
+.mkt-cta-banner .note { margin-top: 14px; font-size: 12.5px; color: #6d7891; }
+
+/* ---- Footer ---- */
+.mkt-footer { padding: 56px 32px 32px; background: var(--sidebar-bg); color: #aab4c6; }
+.mkt-footer-inner { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 32px; }
+.mkt-footer-brand { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+.mkt-footer-brand .name { font-size: 15px; font-weight: 750; color: #fff; }
+.mkt-footer p.desc { font-size: 12.5px; line-height: 1.6; max-width: 260px; }
+.mkt-footer-col h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #6d7891; margin: 0 0 14px; }
+.mkt-footer-col a { display: block; font-size: 13px; color: #c7cedb; margin-bottom: 10px; }
+.mkt-footer-col a:hover { color: #fff; }
+.mkt-footer-bottom {
+  max-width: 1180px; margin: 40px auto 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #6d7891; flex-wrap: wrap; gap: 10px;
+}
+
+@media (max-width: 980px) {
+  .mkt-nav-links { display: none; }
+  .mkt-nav { padding: 12px 16px; gap: 10px; }
+  .mkt-nav-actions { gap: 6px; }
+  .mkt-nav-actions .btn { white-space: nowrap; padding: 9px 12px; font-size: 12.5px; }
+  .mkt-nav-brand .name { font-size: 13.5px; }
+  .mkt-hero-inner { grid-template-columns: 1fr; }
+  .mkt-hero h1 { font-size: 34px; }
+  .mkt-browser { transform: none; }
+  .mkt-stats-strip-inner { grid-template-columns: repeat(2, 1fr); }
+  .mkt-problem-grid, .mkt-feature-grid, .mkt-steps { grid-template-columns: 1fr; }
+  .mkt-step-line { display: none; }
+  .mkt-security { grid-template-columns: 1fr; }
+  .mkt-footer-inner { grid-template-columns: 1fr 1fr; }
+}

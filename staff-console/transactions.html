@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudMeter BMS — Transactions</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMGQxNDIwIi8+PHRleHQgeD0iNTAiIHk9IjY4IiBmb250LXNpemU9IjQ2IiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXdlaWdodD0iODAwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5CPC90ZXh0Pjwvc3ZnPg==">
+<link rel="stylesheet" href="styles.css?v=25">
+<script src="file-protocol-guard.js?v=22"></script>
+<script src="config.js?v=22"></script>
+<script src="session.js?v=22"></script>
+<script src="cognito-client.js?v=22"></script>
+<script src="api-client.js?v=22"></script>
+<script src="bms-guard.js?v=22"></script>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="mark" style="background:linear-gradient(135deg,#0d1420,#24304a)">BMS</span>
+      <span>
+        <span class="name">CloudMeter</span>
+        <span class="tag">business management</span>
+      </span>
+    </div>
+
+    <nav class="nav-group">
+      <span class="nav-label">Platform</span>
+      <a class="nav-link" href="tenants.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
+        CloudMeter Accounts
+      </a>
+      <a class="nav-link" href="users.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        BMS Users
+      </a>
+      <a class="nav-link" href="plans.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>
+        Plans
+      </a>
+      <a class="nav-link" href="adhoc.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Adhoc Spend
+      </a>
+      <a class="nav-link active" href="transactions.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h13l-3-3"/><path d="M21 17H8l3 3"/></svg>
+        Transactions
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="avatar" id="bms-initials">&nbsp;</span>
+      <span class="who">
+        <span class="n" id="bms-name">&nbsp;</span>
+        <span class="r" id="bms-role">&nbsp;</span>
+      </span>
+      <button class="icon-btn-ghost" id="logout-btn" title="Sign out" aria-label="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <h1>Transactions</h1>
+        <p class="sub">Every payment, refund and failed charge across all accounts and gateways</p>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Collected</h2>
+            <p>Totalled per currency. Rupees and dollars are never added together — one combined figure would be fiction.</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="txn-totals" aria-busy="true">
+            <div class="sk-row"><div class="sk-grow"><span class="sk sk-text" style="width:40%"></span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>All transactions</h2>
+            <p>Newest first, as reported by the gateway.</p>
+          </div>
+          <input class="field-input" id="txn-filter" placeholder="Filter by account, plan or gateway" style="max-width:280px">
+        </div>
+        <div class="card-body">
+          <div class="table-scroll">
+            <table class="bms-table">
+              <thead>
+                <tr>
+                  <th>When</th><th>Account</th><th>Plan</th>
+                  <th class="num">Amount</th><th>Status</th><th>Gateway</th><th>Reference</th>
+                </tr>
+              </thead>
+              <tbody id="txn-body" aria-busy="true">
+                <tr><td colspan="7"><span class="sk sk-text" style="width:36%"></span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script src="transactions.js?v=22"></script>
+</body>
+</html>

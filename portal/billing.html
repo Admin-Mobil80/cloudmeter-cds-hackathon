@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudMeter — Billing &amp; Plan</title>
+<meta name="description" content="CloudMeter free trial and usage-based pricing — plans starting at $25/mo, priced by the cloud spend you manage.">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMmE3OGQ2Ii8+PHRleHQgeD0iNTAiIHk9IjY4IiBmb250LXNpemU9IjU4IiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXdlaWdodD0iODAwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5DPC90ZXh0Pjwvc3ZnPg==">
+<link rel="stylesheet" href="styles.css?v=209">
+<script src="file-protocol-guard.js?v=187"></script>
+<script src="ui-guard.js?v=187"></script>
+<script src="config.js?v=187"></script>
+<script src="session.js?v=187"></script>
+<script src="cognito-client.js?v=187"></script>
+<script src="api-client.js?v=187"></script>
+<script src="auth-guard.js?v=187"></script>
+<script src="money.js?v=187"></script>
+<script src="trial.js?v=187"></script>
+<script src="sync-banner.js?v=187"></script>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="mark">CM</span>
+      <span>
+        <span class="name">CloudMeter</span>
+        <span class="tag">&nbsp;</span>
+      </span>
+    </div>
+
+    <nav class="nav-group">
+      <span class="nav-label">Monitor</span>
+      <a class="nav-link" href="dashboard.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-link" href="accounts.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
+        Cloud Accounts
+      </a>
+      <a class="nav-link" href="alerts.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Alerts
+        <span class="count" data-alert-count hidden></span>
+      </a>
+      <a class="nav-link" href="pricing.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.6 13.4 12 22l-9-9V4a1 1 0 0 1 1-1h9l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.6" cy="7.6" r="1.3"/></svg>
+        Provider Pricing
+      </a>
+      <span class="nav-label">CloudMeter Account</span>
+      <a class="nav-link" href="team.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Team
+      </a>
+      <a class="nav-link" href="notifications.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2"/><line x1="4" y1="14" x2="20" y2="14"/><circle cx="16" cy="14" r="2"/><line x1="4" y1="21" x2="20" y2="21"/><circle cx="9" cy="21" r="2"/></svg>
+        Notifications
+      </a>
+      <a class="nav-link active role-manage-only" href="billing.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>
+        Billing &amp; Plan
+      </a>
+      <a class="nav-link role-manage-only" href="settings.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="avatar">&nbsp;</span>
+      <span class="who">
+        <span class="n">&nbsp;</span>
+        <span class="r">&nbsp;</span>
+      </span>
+      <button class="icon-btn-ghost" id="logout-btn" title="Sign out" aria-label="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <h1>Billing &amp; Plan</h1>
+        <p class="sub">Priced by the cloud spend you manage — choose a plan before your trial ends</p>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Trial status -->
+      <section class="trial-card">
+        <div class="trial-card-main">
+          <span class="trial-badge">Free trial</span>
+          <div class="trial-days" data-trial="days-left">4 days left</div>
+          <div class="trial-sub"><span data-trial="day-of">Day 3 of 7</span> · trial ends <strong data-trial="end-date">Aug 18, 2026</strong></div>
+          <div class="trial-progress-track"><div class="trial-progress-fill" data-trial="progress" style="width:43%"></div></div>
+        </div>
+        <div class="trial-card-divider"></div>
+        <div class="trial-card-usage">
+          <div class="tcu-row">
+            <span class="tcu-label">Managed cloud spend, month to date</span>
+            <span class="tcu-value" id="billing-mtd"><span class="sk" style="height:18px;width:78px;display:inline-block"></span></span>
+          </div>
+          <div class="tcu-row">
+            <span class="tcu-label">Cloud accounts</span>
+            <span class="tcu-value" id="billing-projected"><span class="sk" style="height:18px;width:78px;display:inline-block"></span></span>
+          </div>
+          <div class="tcu-recommend" id="billing-recommend"></div>
+        </div>
+      </section>
+
+      <div class="plans-head">
+        <h2>Choose your plan</h2>
+        <p>Tiers scale with the combined cloud spend you're monitoring, not seats. Switch plans anytime as your usage changes.</p>
+        <!-- Shown only when the billing currency differs from the one spend is
+             displayed in. Without it, someone who picked USD in Settings reads
+             rupee prices here with no explanation and reasonably calls it a
+             bug — when in fact these are the figures their card is charged. -->
+        <p class="plans-currency-note" id="plans-currency-note" hidden></p>
+      </div>
+
+      <section class="plan-grid plan-grid-3" id="plan-grid"></section>
+
+      <!-- What is due next, and when. Razorpay's checkout leaves "next due on"
+           blank because no second cycle exists until the mandate is authorised;
+           by the time this page can show it, the date is real. -->
+      <div class="next-payment" id="next-payment" hidden>
+        <span class="next-payment-label">Next payment</span>
+        <span class="next-payment-value" id="next-payment-value"></span>
+        <span class="next-payment-note" id="next-payment-note"></span>
+      </div>
+
+      <!-- Which card is being charged, or plainly that none is attached.
+           Nothing in the product showed this before: a workspace whose Razorpay
+           mandate was never authorised looked identical to a paying one, and
+           one sat that way in production for a month. -->
+      <div class="next-payment" id="payment-method" hidden>
+        <span class="next-payment-label">Payment method</span>
+        <span class="next-payment-value" id="payment-method-value"></span>
+        <span class="next-payment-note" id="payment-method-note"></span>
+      </div>
+
+      <div class="selected-plan-note" id="selected-plan-note"></div>
+
+      <section class="how-it-works">
+        <h3>How usage-based billing works</h3>
+        <div class="hiw-steps">
+          <div class="hiw-step">
+            <span class="hiw-num">1</span>
+            <div class="hiw-t">Connect your clouds</div>
+            <div class="hiw-s">No card needed during your 7-day trial — link as many accounts as you like.</div>
+          </div>
+          <div class="hiw-step">
+            <span class="hiw-num">2</span>
+            <div class="hiw-t">We measure combined spend</div>
+            <div class="hiw-s">Every connected account's monthly cost rolls into one number, updated hourly.</div>
+          </div>
+          <div class="hiw-step">
+            <span class="hiw-num">3</span>
+            <div class="hiw-t">You're billed for the matching tier</div>
+            <div class="hiw-s">Move up or down automatically as your managed spend changes — no manual step.</div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="plans.js?v=187"></script>
+<script src="billing.js?v=187"></script>
+</body>
+</html>

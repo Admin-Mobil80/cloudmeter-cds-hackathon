@@ -1,0 +1,11 @@
+node_modules/
+cdk.out/
+cdk.out.*
+.cdk.staging/
+.build/
+*.d.ts
+backend/**/*.js
+!backend/jest.config.js
+.env
+.env.*
+.DS_Store

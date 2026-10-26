@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudMeter — Team</title>
+<meta name="description" content="Manage who has access to this CloudMeter account — one Owner, plus Admins who can manage cloud accounts and read-only Members.">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMmE3OGQ2Ii8+PHRleHQgeD0iNTAiIHk9IjY4IiBmb250LXNpemU9IjU4IiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXdlaWdodD0iODAwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5DPC90ZXh0Pjwvc3ZnPg==">
+<link rel="stylesheet" href="styles.css?v=209">
+<script src="file-protocol-guard.js?v=186"></script>
+<script src="ui-guard.js?v=186"></script>
+<script src="config.js?v=186"></script>
+<script src="session.js?v=186"></script>
+<script src="cognito-client.js?v=186"></script>
+<script src="api-client.js?v=186"></script>
+<script src="auth-guard.js?v=186"></script>
+<script src="money.js?v=186"></script>
+<script src="trial.js?v=186"></script>
+<script src="sync-banner.js?v=186"></script>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="mark">CM</span>
+      <span>
+        <span class="name">CloudMeter</span>
+        <span class="tag">&nbsp;</span>
+      </span>
+    </div>
+
+    <nav class="nav-group">
+      <span class="nav-label">Monitor</span>
+      <a class="nav-link" href="dashboard.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-link" href="accounts.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
+        Cloud Accounts
+      </a>
+      <a class="nav-link" href="alerts.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Alerts
+        <span class="count" data-alert-count hidden></span>
+      </a>
+      <a class="nav-link" href="pricing.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.6 13.4 12 22l-9-9V4a1 1 0 0 1 1-1h9l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.6" cy="7.6" r="1.3"/></svg>
+        Provider Pricing
+      </a>
+      <span class="nav-label">CloudMeter Account</span>
+      <a class="nav-link active" href="team.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Team
+      </a>
+      <a class="nav-link" href="notifications.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2"/><line x1="4" y1="14" x2="20" y2="14"/><circle cx="16" cy="14" r="2"/><line x1="4" y1="21" x2="20" y2="21"/><circle cx="9" cy="21" r="2"/></svg>
+        Notifications
+      </a>
+      <a class="nav-link role-manage-only" href="billing.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>
+        Billing &amp; Plan
+      </a>
+      <a class="nav-link role-manage-only" href="settings.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="avatar">&nbsp;</span>
+      <span class="who">
+        <span class="n">&nbsp;</span>
+        <span class="r">&nbsp;</span>
+      </span>
+      <button class="icon-btn-ghost" id="logout-btn" title="Sign out" aria-label="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <h1>Team</h1>
+        <p class="sub">Manage who has access to this CloudMeter account</p>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Members -->
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Members</h2>
+            <p id="member-count-sub"><span class="sk sk-text" style="width:150px"></span></p>
+          </div>
+        </div>
+        <div id="team-list" aria-busy="true" aria-label="Loading team members">
+          <div class="sk-row">
+            <span class="sk" style="width:34px;height:34px;border-radius:999px"></span>
+            <div class="sk-grow"><span class="sk sk-text" style="width:34%"></span></div>
+            <span class="sk" style="height:22px;width:64px;border-radius:999px"></span>
+            <span class="sk sk-text" style="width:90px"></span>
+          </div>
+          <div class="sk-row">
+            <span class="sk" style="width:34px;height:34px;border-radius:999px"></span>
+            <div class="sk-grow"><span class="sk sk-text" style="width:34%"></span></div>
+            <span class="sk" style="height:22px;width:64px;border-radius:999px"></span>
+            <span class="sk sk-text" style="width:90px"></span>
+          </div>
+          <div class="sk-row">
+            <span class="sk" style="width:34px;height:34px;border-radius:999px"></span>
+            <div class="sk-grow"><span class="sk sk-text" style="width:34%"></span></div>
+            <span class="sk" style="height:22px;width:64px;border-radius:999px"></span>
+            <span class="sk sk-text" style="width:90px"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Invite (Owner + Admin) -->
+      <section class="card role-write">
+        <div class="card-head">
+          <div>
+            <h2>Invite a team member</h2>
+            <p>They'll get an email with a link to join this account</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="invite-form">
+            <div class="field-group">
+              <label class="field-label" for="invite-name">Name</label>
+              <input class="field-input" type="text" id="invite-name" placeholder="Neeta Kumar" maxlength="80" autocomplete="name">
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="invite-email">Work email</label>
+              <input class="field-input" type="email" id="invite-email" placeholder="teammate@company.com">
+            </div>
+            <div class="field-group role-field">
+              <label class="field-label" for="invite-role">Role</label>
+              <select class="field-input" id="invite-role">
+                <option value="admin">Admin</option>
+                <option value="member" selected>Member</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="invite-btn">Send invite</button>
+          </div>
+          <div class="field-error" id="invite-error">Enter a valid work email.</div>
+          <div class="demo-note" style="margin-top:14px">They'll receive an email from <strong>no-reply@cloudmeter.io</strong> with a link to sign in. No sign-up needed — they enter this address and we email them a one-time code.</div>
+        </div>
+      </section>
+
+      <!-- Role explainer -->
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>What each role can do</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="role-explain-grid">
+            <div class="role-explain-card">
+              <h4><span class="role-badge role-badge-owner">Owner</span></h4>
+              <p>Full access — connects cloud accounts, manages billing and the payment method, and invites or removes team members. Exactly one per account: whoever created it.</p>
+            </div>
+            <div class="role-explain-card">
+              <h4><span class="role-badge role-badge-admin">Admin</span></h4>
+              <p>Can add, edit and remove cloud accounts, view dashboards and alerts, and acknowledge or escalate anomalies. Can't access billing, payment or team management.</p>
+            </div>
+            <div class="role-explain-card">
+              <h4><span class="role-badge role-badge-member">Member</span></h4>
+              <p>Read-only — can view the dashboard, alerts and connected cloud accounts, but can't add, edit or remove anything.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="team.js?v=195"></script>
+</body>
+</html>

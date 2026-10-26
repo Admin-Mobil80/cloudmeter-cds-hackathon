@@ -1,0 +1,32 @@
+{
+  "name": "cloudmeter_daily_digest_v2",
+  "language": "en",
+  "category": "UTILITY",
+  "parameter_format": "POSITIONAL",
+  "components": [
+    {
+      "type": "HEADER",
+      "format": "TEXT",
+      "text": "CloudMeter daily summary for {{1}}",
+      "example": { "header_text": ["Mobil80 Solutions"] }
+    },
+    {
+      "type": "BODY",
+      "text": "Spend on {{1}}: {{2}}\nMonth to date: {{3}} ({{4}} vs the same point last month)\nBiggest mover: {{5}}\nTop services that day: {{6}}\n\nFull breakdown: portal.cloudmeter.io/dashboard.html",
+      "example": {
+        "body_text": [[
+          "19 Aug 2026",
+          "$142.87",
+          "$2,727",
+          "up 12%",
+          "AWS Lambda, up $274",
+          "Amazon EC2 $61 · Amazon S3 $38 · AWS Lambda $29 · Amazon RDS $9 · +4 more"
+        ]]
+      }
+    },
+    {
+      "type": "FOOTER",
+      "text": "Manage alerts in CloudMeter → Notifications"
+    }
+  ]
+}

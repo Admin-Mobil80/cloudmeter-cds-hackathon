@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudMeter BMS — Sign in</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMGQxNDIwIi8+PHRleHQgeD0iNTAiIHk9IjY4IiBmb250LXNpemU9IjQ2IiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXdlaWdodD0iODAwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5CPC90ZXh0Pjwvc3ZnPg==">
+<link rel="stylesheet" href="styles.css?v=25">
+<script src="file-protocol-guard.js?v=22"></script>
+<script src="config.js?v=22"></script>
+<script src="session.js?v=22"></script>
+<script src="cognito-client.js?v=22"></script>
+</head>
+<body>
+
+<div class="auth-shell">
+  <div class="auth-card">
+    <a class="auth-brand" href="#">
+      <span class="mark" style="background:linear-gradient(135deg,#0d1420,#24304a)">BMS</span>
+      <span>
+        <span class="name">CloudMeter</span>
+        <span class="tag">business management</span>
+      </span>
+    </a>
+
+    <span class="auth-badge">Staff access only</span>
+
+    <div class="auth-step active" id="step-email">
+      <h1>Sign in</h1>
+      <p class="sub">Enter your CloudMeter staff email and we'll send a one-time code.</p>
+
+      <label class="field-label" for="email-input">Work email</label>
+      <input class="field-input" type="email" id="email-input" placeholder="you@mobil80.com" autocomplete="email">
+      <div class="field-error" id="email-error">Enter a valid email address.</div>
+
+      <button class="btn btn-primary btn-block" id="send-otp-btn">Send code</button>
+    </div>
+
+    <div class="auth-step" id="step-otp">
+      <h1>Enter your code</h1>
+      <p class="sub">We sent a 6-digit code to <strong id="otp-email-target">you</strong></p>
+
+      <label class="field-label">One-time code</label>
+      <div class="otp-row">
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+      </div>
+      <div class="field-error" id="otp-error">That code didn't work — try again.</div>
+
+      <button class="btn btn-primary btn-block" id="verify-btn">Verify &amp; continue</button>
+      <div class="auth-links">
+        <button class="back-link" id="back-btn">← Use a different email</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="login.js?v=22"></script>
+</body>
+</html>

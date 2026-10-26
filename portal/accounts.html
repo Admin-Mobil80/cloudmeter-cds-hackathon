@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudMeter — Cloud Accounts</title>
+<meta name="description" content="Every AWS, Azure, GCP, Alibaba Cloud and Huawei Cloud account or subscription feeding the unified CloudMeter ledger — a business can connect any number per provider.">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMmE3OGQ2Ii8+PHRleHQgeD0iNTAiIHk9IjY4IiBmb250LXNpemU9IjU4IiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXdlaWdodD0iODAwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5DPC90ZXh0Pjwvc3ZnPg==">
+<link rel="stylesheet" href="styles.css?v=209">
+<script src="file-protocol-guard.js?v=191"></script>
+<script src="ui-guard.js?v=191"></script>
+<script src="config.js?v=191"></script>
+<script src="session.js?v=191"></script>
+<script src="cognito-client.js?v=191"></script>
+<script src="api-client.js?v=191"></script>
+<script src="auth-guard.js?v=191"></script>
+<script src="money.js?v=191"></script>
+<script src="trial.js?v=191"></script>
+<script src="sync-banner.js?v=191"></script>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="mark">CM</span>
+      <span>
+        <span class="name">CloudMeter</span>
+        <span class="tag">&nbsp;</span>
+      </span>
+    </div>
+
+    <nav class="nav-group">
+      <span class="nav-label">Monitor</span>
+      <a class="nav-link" href="dashboard.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-link active" href="accounts.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
+        Cloud Accounts
+      </a>
+      <a class="nav-link" href="alerts.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Alerts
+        <span class="count" data-alert-count hidden></span>
+      </a>
+      <a class="nav-link" href="pricing.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.6 13.4 12 22l-9-9V4a1 1 0 0 1 1-1h9l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.6" cy="7.6" r="1.3"/></svg>
+        Provider Pricing
+      </a>
+      <span class="nav-label">CloudMeter Account</span>
+      <a class="nav-link" href="team.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Team
+      </a>
+      <a class="nav-link" href="notifications.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2"/><line x1="4" y1="14" x2="20" y2="14"/><circle cx="16" cy="14" r="2"/><line x1="4" y1="21" x2="20" y2="21"/><circle cx="9" cy="21" r="2"/></svg>
+        Notifications
+      </a>
+      <a class="nav-link role-manage-only" href="billing.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>
+        Billing &amp; Plan
+      </a>
+      <a class="nav-link role-manage-only" href="settings.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="avatar">&nbsp;</span>
+      <span class="who">
+        <span class="n">&nbsp;</span>
+        <span class="r">&nbsp;</span>
+      </span>
+      <button class="icon-btn-ghost" id="logout-btn" title="Sign out" aria-label="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <h1>Cloud Accounts</h1>
+        <p class="sub">Connect any number of accounts per provider — each rolls up into the unified ledger</p>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-primary role-write" data-open-add-account>+ Add cloud account</button>
+      </div>
+    </header>
+
+    <div class="trial-banner" id="trial-banner" hidden>
+      <div class="trial-banner-inner">
+        <span class="trial-ic">🎉</span>
+        <span class="trial-text"><strong>Free trial — <span data-trial="days-left">4 days left</span>.</strong> Pick a plan before <span data-trial="end-date">Aug 18, 2026</span> to keep your data flowing — plans start at just $25/mo.</span>
+        <a href="billing.html" class="btn btn-sm btn-primary">Choose a plan</a>
+        <button class="trial-close" id="trial-close" aria-label="Dismiss">✕</button>
+      </div>
+    </div>
+
+    <main class="content">
+
+      <div class="readonly-banner">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        You have read-only access. Ask your account Owner or an Admin to add, edit or remove cloud accounts.
+      </div>
+
+      <section class="stat-grid">
+        <div class="stat-tile">
+          <div class="label">Connected accounts</div>
+          <div class="value" id="stat-total-accounts"><span class="sk"></span></div>
+          <div class="row"><span class="delta up-good" id="stat-total-accounts-sub"><span class="sk sk-text"></span></span></div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">Providers in use</div>
+          <div class="value" id="stat-providers-count"><span class="sk"></span></div>
+          <div class="row"><span class="delta flat" id="stat-providers-list"><span class="sk sk-text"></span></span></div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">Most accounts on one provider</div>
+          <div class="value" id="stat-top-provider"><span class="sk"></span></div>
+          <div class="row"><span class="delta flat" id="stat-top-provider-sub"><span class="sk sk-text"></span></span></div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">All read-only IAM roles</div>
+          <div class="value" id="stat-readonly"><span class="sk"></span></div>
+          <div class="row"><span class="delta up-good">zero write access granted</span></div>
+        </div>
+      </section>
+
+      <div id="accounts-container">
+        <section class="card" aria-busy="true" aria-label="Loading cloud accounts">
+          <div class="accounts-group-head">
+            <span class="sk" style="width:44px;height:44px;border-radius:12px"></span>
+            <div style="flex:1">
+              <span class="sk sk-text" style="width:180px;margin-bottom:6px"></span>
+              <span class="sk sk-text" style="width:280px"></span>
+            </div>
+          </div>
+          <div class="sk-row">
+            <div class="sk-grow"><span class="sk sk-text" style="width:38%"></span></div>
+            <span class="sk sk-text" style="width:70px"></span>
+            <span class="sk sk-text" style="width:110px"></span>
+            <span class="sk" style="height:24px;width:78px;border-radius:999px"></span>
+          </div>
+          <div class="sk-row">
+            <div class="sk-grow"><span class="sk sk-text" style="width:38%"></span></div>
+            <span class="sk sk-text" style="width:70px"></span>
+            <span class="sk sk-text" style="width:110px"></span>
+            <span class="sk" style="height:24px;width:78px;border-radius:999px"></span>
+          </div>
+          <div class="sk-row">
+            <div class="sk-grow"><span class="sk sk-text" style="width:38%"></span></div>
+            <span class="sk sk-text" style="width:70px"></span>
+            <span class="sk sk-text" style="width:110px"></span>
+            <span class="sk" style="height:24px;width:78px;border-radius:999px"></span>
+          </div>
+          <div class="sk-row">
+            <div class="sk-grow"><span class="sk sk-text" style="width:38%"></span></div>
+            <span class="sk sk-text" style="width:70px"></span>
+            <span class="sk sk-text" style="width:110px"></span>
+            <span class="sk" style="height:24px;width:78px;border-radius:999px"></span>
+          </div>
+          <div class="sk-row">
+            <div class="sk-grow"><span class="sk sk-text" style="width:38%"></span></div>
+            <span class="sk sk-text" style="width:70px"></span>
+            <span class="sk sk-text" style="width:110px"></span>
+            <span class="sk" style="height:24px;width:78px;border-radius:999px"></span>
+          </div>
+        </section>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="providers.js?v=191"></script>
+<script src="accounts-data.js?v=191"></script>
+<script src="account-rename.js?v=191"></script>
+<script src="accounts.js?v=194"></script>
+<script src="adhoc-catalog.js?v=197"></script>
+<script src="adhoc-items.js?v=193"></script>
+<script src="add-account.js?v=197"></script>
+</body>
+</html>

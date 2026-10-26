@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support · CloudMeter</title>
+<meta name="description" content="Get help with CloudMeter.">
+<style>
+/* Shared styles for CloudMeter's legal and support pages. */
+:root {
+  --brand: #2a78d6;
+  --brand-dark: #184f95;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --line: #e1e0d9;
+  --page: #f5f6f4;
+  --card: #ffffff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.top { background: #0d1420; padding: 14px 20px; }
+.brand { color: #fff; text-decoration: none; font-weight: 700; font-size: 18px; display: inline-flex; align-items: center; gap: 8px; }
+.brand .mark {
+  display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-dark)); font-size: 16px;
+}
+main {
+  max-width: 760px; margin: 24px auto 48px; padding: 28px 24px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+}
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 8px; }
+h2 { font-size: 20px; margin: 32px 0 8px; }
+h3 { font-size: 16px; margin: 20px 0 4px; }
+.meta { color: var(--ink-2); font-size: 14px; margin: 0 0 20px; }
+.lead { font-size: 17px; color: var(--ink-2); }
+a { color: var(--brand); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+.callout { background: #eaf1fc; border: 1px solid #c9dcf6; border-radius: 12px; padding: 12px 16px; margin: 16px 0; }
+details { border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; margin: 8px 0; }
+summary { cursor: pointer; font-weight: 600; }
+details p { margin: 8px 0 2px; color: var(--ink-2); }
+.links { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink-2); }
+@media (max-width: 600px) {
+  main { margin: 0; border-radius: 0; border-left: 0; border-right: 0; padding: 20px 16px; }
+  h1 { font-size: 26px; }
+}
+</style>
+</head>
+<body>
+<header class="top"><a class="brand" href="https://www.cloudmeter.io"><span class="mark">☁</span> CloudMeter</a></header>
+<main>
+<h1>CloudMeter support</h1>
+<p class="lead">Email <a href="mailto:neeta@mobil80.com">neeta@mobil80.com</a> — we reply within one business day. Include your workspace name and, if something looks wrong, a screenshot.</p>
+<p>CloudMeter alerts on WhatsApp come from <strong>+91 81058 23737</strong>. We will never ask you for passwords or card details over WhatsApp or email.</p>
+
+<h2>Signing in</h2>
+<details><summary>I didn't get my 6-digit sign-in code</summary>
+<p>Codes arrive within a minute. Check spam and promotions folders, and make sure you're using the email your workspace was set up with. Tap <em>Resend code</em> after 20 seconds. Each code works once.</p></details>
+<details><summary>It says there's no CloudMeter access for my email</summary>
+<p>Your email isn't part of any workspace yet. Ask your workspace Owner to invite you, or create a new workspace at <a href="https://portal.cloudmeter.io">portal.cloudmeter.io</a>.</p></details>
+<details><summary>How do I switch between workspaces?</summary>
+<p>If you belong to more than one workspace, tap the workspace name at the top of any screen in the app (or the account menu in the portal) and choose another.</p></details>
+
+<h2>Connecting clouds</h2>
+<details><summary>How do I connect AWS, Azure, Google Cloud or OpenAI?</summary>
+<p>Owners and Admins connect accounts in the portal under <strong>Accounts → Add account</strong>, which walks you through granting read-only access for each provider. CloudMeter can never change your cloud resources.</p></details>
+<details><summary>My new account says "Syncing…"</summary>
+<p>The first sync can take a few minutes, and some providers publish cost data with a delay of up to a day. If it still hasn't synced after 24 hours, check the error shown on the account page, or email us.</p></details>
+
+<h2>Plans and billing</h2>
+<details><summary>How do plans work?</summary>
+<p>New workspaces get a 7-day free trial. After that, choose Starter, Growth or Scale depending on how many cloud accounts and how much monthly spend you monitor. A plan covers your whole team.</p></details>
+<details><summary>I bought a plan on the web. How do I add it to my workspace?</summary>
+<p>Install the CloudMeter app, sign in with your work email, then tap <em>Add plan to my workspace</em> on the checkout confirmation page or in your receipt email — on the same phone. The plan is added to the workspace that is active in the app. New to CloudMeter? Create your free account at <a href="https://portal.cloudmeter.io">portal.cloudmeter.io</a> first, using the same email you paid with.</p></details>
+<details><summary>My "add plan" link has expired</summary>
+<p>Tap it anyway — we'll email a fresh link to the address you paid with. If that doesn't arrive, email us with your receipt.</p></details>
+<details><summary>How do I cancel or change my plan?</summary>
+<p>Use the "manage subscription" link in your receipt email, or Billing in the portal. Cancelling keeps your plan until the end of the period you've paid for.</p></details>
+
+<h2>Your account and data</h2>
+<details><summary>How do I delete my account?</summary>
+<p>If you're the workspace Owner, delete it on the web portal: sign in at portal.cloudmeter.io, cancel any paid plan under Billing, then go to <strong>Settings → Close this CloudMeter account</strong>, type DELETE and confirm. This permanently deletes the workspace and all its data. In the app, <strong>More → Delete account</strong> opens the portal for you. If you're an Admin or Member, only the Owner can delete the workspace — the app tells you who to contact. Full details: <a href="delete-account.html">Delete your account</a>.</p></details>
+<details><summary>Where can I read how my data is used?</summary>
+<p>See our <a href="privacy.html">Privacy Policy</a> and <a href="terms.html">Terms of Use</a>.</p></details>
+
+<footer class="links"><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Use</a> · <a href="delete-account.html">Delete account</a></footer>
+</main>
+</body>
+</html>

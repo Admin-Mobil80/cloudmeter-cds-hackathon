@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudMeter — Settings</title>
+<meta name="description" content="CloudMeter account settings — monitoring, notification rules, organization details, tax ID, billing address and payment method.">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMmE3OGQ2Ii8+PHRleHQgeD0iNTAiIHk9IjY4IiBmb250LXNpemU9IjU4IiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXdlaWdodD0iODAwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5DPC90ZXh0Pjwvc3ZnPg==">
+<link rel="stylesheet" href="styles.css?v=209">
+<script src="file-protocol-guard.js?v=187"></script>
+<script src="ui-guard.js?v=187"></script>
+<script src="config.js?v=187"></script>
+<script src="session.js?v=187"></script>
+<script src="cognito-client.js?v=187"></script>
+<script src="api-client.js?v=187"></script>
+<script src="auth-guard.js?v=187"></script>
+<script src="money.js?v=187"></script>
+<script src="trial.js?v=187"></script>
+<script src="sync-banner.js?v=187"></script>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="mark">CM</span>
+      <span>
+        <span class="name">CloudMeter</span>
+        <span class="tag">&nbsp;</span>
+      </span>
+    </div>
+
+    <nav class="nav-group">
+      <span class="nav-label">Monitor</span>
+      <a class="nav-link" href="dashboard.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-link" href="accounts.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
+        Cloud Accounts
+      </a>
+      <a class="nav-link" href="alerts.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Alerts
+        <span class="count" data-alert-count hidden></span>
+      </a>
+      <a class="nav-link" href="pricing.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.6 13.4 12 22l-9-9V4a1 1 0 0 1 1-1h9l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.6" cy="7.6" r="1.3"/></svg>
+        Provider Pricing
+      </a>
+      <span class="nav-label">CloudMeter Account</span>
+      <a class="nav-link" href="team.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Team
+      </a>
+      <a class="nav-link" href="notifications.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2"/><line x1="4" y1="14" x2="20" y2="14"/><circle cx="16" cy="14" r="2"/><line x1="4" y1="21" x2="20" y2="21"/><circle cx="9" cy="21" r="2"/></svg>
+        Notifications
+      </a>
+      <a class="nav-link role-manage-only" href="billing.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>
+        Billing &amp; Plan
+      </a>
+      <a class="nav-link active role-manage-only" href="settings.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="avatar">&nbsp;</span>
+      <span class="who">
+        <span class="n">&nbsp;</span>
+        <span class="r">&nbsp;</span>
+      </span>
+      <button class="icon-btn-ghost" id="logout-btn" title="Sign out" aria-label="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <h1>Settings</h1>
+        <p class="sub">Monitoring, notification rules, organization details, billing address and payment method</p>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Cost monitoring -->
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Cost monitoring</h2>
+            <p>How often CloudMeter pulls fresh cost data from your connected cloud accounts</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="settings-grid">
+            <div>
+              <label class="field-label" for="monitor-frequency">Refresh frequency</label>
+              <select class="field-input" id="monitor-frequency">
+                <option value="1">Once a day</option>
+                <option value="2">Twice a day</option>
+                <option value="3">3 times a day</option>
+                <option value="4">4 times a day</option>
+                <option value="6">6 times a day</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Minimum gap between pulls</label>
+              <input class="field-input" id="monitor-interval" value="—" readonly>
+            </div>
+          </div>
+          <p class="muted" style="font-size:12.5px;margin-top:12px">
+            Applies to every connected account across CloudMeter. Cloud providers charge for cost-API
+            requests (AWS Cost Explorer bills about $0.01 per request), so a lower frequency means a
+            smaller monitoring bill. Anomaly detection runs on each refresh, so higher frequencies
+            catch spikes sooner.
+          </p>
+          <div class="settings-save-row">
+            <button class="btn btn-primary" id="monitor-save-btn">Save changes</button>
+            <span class="save-confirm" id="monitor-confirm">✓ Saved</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Timezone & digest timing -->
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Timezone &amp; daily digest</h2>
+            <p>When your team should hear from CloudMeter each day</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="settings-grid">
+            <div>
+              <label class="field-label" for="tenant-timezone">Timezone</label>
+              <select class="field-input" id="tenant-timezone"></select>
+            </div>
+            <div>
+              <label class="field-label" for="digest-hour">Send the daily digest at</label>
+              <select class="field-input" id="digest-hour"></select>
+            </div>
+          </div>
+          <p class="muted" style="font-size:12.5px;margin-top:12px" id="digest-timing-note"></p>
+          <p class="muted" style="font-size:12.5px;margin-top:8px">
+            Cloud providers post cost data hours after it's incurred, so a digest always reports the
+            most recent <strong>complete</strong> day and names the date it covers — never a
+            part-finished today.
+          </p>
+          <div class="settings-save-row">
+            <button class="btn btn-primary" id="timezone-save-btn">Save changes</button>
+            <span class="save-confirm" id="timezone-confirm">✓ Saved</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Display currency -->
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Currency</h2>
+            <p>What currency spend is shown in across CloudMeter and in your emails</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="settings-grid">
+            <div>
+              <label class="field-label" for="display-currency">Show spend in</label>
+              <select class="field-input" id="display-currency">
+                <option value="LOCAL">Local currency</option>
+                <option value="USD">US Dollars (USD)</option>
+              </select>
+            </div>
+            <!-- The manual-rate field and its "Set it myself" option are gone:
+                 no tenant had ever set one, and the input only ever appeared
+                 alongside the live-rate option that made it meaningless. The
+                 API still accepts fxSource and fxRateManual, so restoring the
+                 markup is all that is needed to bring the choice back. -->
+            <div id="fx-source-wrap">
+              <label class="field-label" for="fx-source">Exchange rate</label>
+              <!-- Read-only rather than a one-option dropdown, matching
+                   "Minimum gap between pulls" above: a select you cannot change
+                   invites a click and then does nothing. -->
+              <input class="field-input" id="fx-source" value="Live rate, updated daily" readonly>
+            </div>
+          </div>
+          <p class="muted" style="font-size:12.5px;margin-top:12px" id="currency-note"></p>
+          <p class="muted" style="font-size:12.5px;margin-top:8px">
+            Costs are always collected and stored in USD, then converted for display — so changing
+            this never alters your recorded spend, and switching back shows exactly the figures you
+            saw before.
+          </p>
+          <div class="settings-save-row">
+            <button class="btn btn-primary" id="currency-save-btn">Save changes</button>
+            <span class="save-confirm" id="currency-confirm">✓ Saved</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Anomaly alerts -->
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Anomaly alerts</h2>
+            <p>Get notified the moment a service's cost spikes by a significant amount</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="rule-fields-grid">
+            <div>
+              <label class="field-label" for="anomaly-severity">Notify me for</label>
+              <select class="field-input" id="anomaly-severity">
+                <option value="critical">Critical only</option>
+                <option value="critical_serious" selected>Critical &amp; Serious</option>
+                <option value="all">All severities, including Warning</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" for="anomaly-threshold">Minimum estimated impact</label>
+              <div class="input-prefix-group">
+                <span class="prefix">$</span>
+                <input class="field-input" type="number" id="anomaly-threshold" value="10" min="0" step="10">
+              </div>
+            </div>
+          </div>
+          <div class="settings-save-row">
+            <button class="btn btn-primary" id="anomaly-save-btn">Save changes</button>
+            <span class="save-confirm" id="anomaly-confirm">✓ Saved</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Business / Organization -->
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Business &amp; organization</h2>
+            <p>Shown on invoices and used for tax purposes</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="settings-grid">
+            <div>
+              <label class="field-label" for="org-name">Business / organization name</label>
+              <input class="field-input" id="org-name" placeholder="Acme Inc." maxlength="80">
+              <div class="provider-meta" style="margin-top:4px">Shown in the sidebar on every page</div>
+            </div>
+            <div>
+              <label class="field-label" for="org-tax-id">Tax ID / VAT number</label>
+              <input class="field-input" id="org-tax-id" placeholder="e.g. 27AAAAA0000A1Z5">
+            </div>
+            <div>
+              <label class="field-label" for="org-email">Billing email</label>
+              <input class="field-input" type="email" id="org-email" value="rohan@mobil80.com">
+            </div>
+            <div>
+              <label class="field-label" for="org-size">Company size</label>
+              <select class="field-input" id="org-size">
+                <option>1–10 employees</option>
+                <option selected>11–50 employees</option>
+                <option>51–200 employees</option>
+                <option>201–1000 employees</option>
+                <option>1000+ employees</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings-save-row">
+            <button class="btn btn-primary" id="org-save-btn">Save changes</button>
+            <span class="save-confirm" id="org-confirm">✓ Saved</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Billing address -->
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Billing address</h2>
+            <p>Used on invoices and receipts</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="settings-grid">
+            <div class="span-2">
+              <label class="field-label" for="addr-line1">Address line 1</label>
+              <input class="field-input" id="addr-line1" placeholder="123 MG Road">
+            </div>
+            <div class="span-2">
+              <label class="field-label" for="addr-line2">Address line 2 <span class="optional">(optional)</span></label>
+              <input class="field-input" id="addr-line2" placeholder="Suite 400">
+            </div>
+            <div>
+              <label class="field-label" for="addr-city">City</label>
+              <input class="field-input" id="addr-city" placeholder="Bengaluru">
+            </div>
+            <div>
+              <label class="field-label" for="addr-state">State / Province</label>
+              <input class="field-input" id="addr-state" placeholder="Karnataka">
+            </div>
+            <div>
+              <label class="field-label" for="addr-zip">Postal code</label>
+              <input class="field-input" id="addr-zip" placeholder="560001">
+            </div>
+            <div>
+              <label class="field-label" for="addr-country">Country</label>
+              <select class="field-input" id="addr-country">
+                <option selected>India</option>
+                <option>United States</option>
+                <option>United Kingdom</option>
+                <option>Singapore</option>
+                <option>United Arab Emirates</option>
+                <option>Germany</option>
+                <option>Australia</option>
+              </select>
+            </div>
+          </div>
+          <div class="settings-save-row">
+            <button class="btn btn-primary" id="address-save-btn">Save changes</button>
+            <span class="save-confirm" id="address-confirm">✓ Saved</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Close account (Owner only) -->
+      <section class="card danger-card role-owner-only">
+        <div class="card-head">
+          <div>
+            <h2>Close this CloudMeter account</h2>
+            <p>Permanently deletes this CloudMeter account and everything in it</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <p style="font-size:13.5px;margin:0 0 12px">Closing the account immediately and permanently deletes:</p>
+          <ul class="danger-list">
+            <li>All connected cloud accounts and their stored credentials</li>
+            <li>All cost history, breakdowns and anomaly alerts</li>
+            <li>Every team member's access, including your own sign-in</li>
+          </ul>
+          <p class="danger-warning">
+            This cannot be undone. There is no grace period and no way for support to recover
+            the data afterwards. Export anything you need first.
+          </p>
+
+          <label class="field-label" for="close-confirm" style="margin-top:16px">
+            Type <strong>DELETE</strong> to confirm
+          </label>
+          <input class="field-input" id="close-confirm" placeholder="DELETE" autocomplete="off" spellcheck="false">
+          <div class="field-error" id="close-error">Type DELETE exactly to confirm.</div>
+
+          <div class="settings-save-row">
+            <button class="btn btn-danger" id="close-account-btn" disabled>Close account permanently</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="settings.js?v=187"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+type Me {
+  userId: ID!
+  email: String!
+  tenantId: ID!
+  role: String!
+  status: String!
+  tenantCreatedAt: String
+}
+
+type Query {
+  me: Me
+}

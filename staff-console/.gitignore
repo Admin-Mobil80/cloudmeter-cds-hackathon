@@ -1,0 +1,8 @@
+# macOS Finder writes one of these into every folder it opens, recording the
+# window size, icon positions and sort order for whoever opened it. It has
+# nothing to do with the console, and two people's copies always differ — so
+# committing it produced merge conflicts about nothing but window settings.
+#
+# The deploy excludes this file by name, so it stays out of the bucket rather
+# than being published the way the file it guards against was.
+.DS_Store

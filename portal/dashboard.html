@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudMeter — Dashboard</title>
+<meta name="description" content="Unified cloud cost ledger — AWS, Azure, GCP, Alibaba and Huawei Cloud, normalized in one hourly-refreshed dashboard.">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMmE3OGQ2Ii8+PHRleHQgeD0iNTAiIHk9IjY4IiBmb250LXNpemU9IjU4IiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXdlaWdodD0iODAwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5DPC90ZXh0Pjwvc3ZnPg==">
+<link rel="stylesheet" href="styles.css?v=209">
+<script src="file-protocol-guard.js?v=191"></script>
+<script src="ui-guard.js?v=191"></script>
+<script src="config.js?v=191"></script>
+<script src="session.js?v=191"></script>
+<script src="cognito-client.js?v=191"></script>
+<script src="api-client.js?v=191"></script>
+<script src="auth-guard.js?v=191"></script>
+<script src="money.js?v=191"></script>
+<script src="trial.js?v=191"></script>
+<script src="sync-banner.js?v=191"></script>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="mark">CM</span>
+      <span>
+        <span class="name">CloudMeter</span>
+        <span class="tag">&nbsp;</span>
+      </span>
+    </div>
+
+    <nav class="nav-group">
+      <span class="nav-label">Monitor</span>
+      <a class="nav-link active" href="dashboard.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-link" href="accounts.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
+        Cloud Accounts
+      </a>
+      <a class="nav-link" href="alerts.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Alerts
+        <span class="count" data-alert-count hidden></span>
+      </a>
+      <a class="nav-link" href="pricing.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.6 13.4 12 22l-9-9V4a1 1 0 0 1 1-1h9l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.6" cy="7.6" r="1.3"/></svg>
+        Provider Pricing
+      </a>
+      <span class="nav-label">CloudMeter Account</span>
+      <a class="nav-link" href="team.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Team
+      </a>
+      <a class="nav-link" href="notifications.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2"/><line x1="4" y1="14" x2="20" y2="14"/><circle cx="16" cy="14" r="2"/><line x1="4" y1="21" x2="20" y2="21"/><circle cx="9" cy="21" r="2"/></svg>
+        Notifications
+      </a>
+      <a class="nav-link role-manage-only" href="billing.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>
+        Billing &amp; Plan
+      </a>
+      <a class="nav-link role-manage-only" href="settings.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="avatar">&nbsp;</span>
+      <span class="who">
+        <span class="n">&nbsp;</span>
+        <span class="r">&nbsp;</span>
+      </span>
+      <button class="icon-btn-ghost" id="logout-btn" title="Sign out" aria-label="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <h1>Dashboard</h1>
+        <p class="sub" id="dashboard-sub">Unified ledger across your connected accounts</p>
+      </div>
+      <div class="topbar-right">
+        <span class="freshness" id="freshness-indicator" style="display:none"><span class="dot"></span> <span id="freshness-text"></span></span>
+        <div class="provider-stack" title="AWS, Azure, GCP, Alibaba Cloud, Huawei Cloud, OpenAI, WhatsApp Business">
+          <span class="provider-chip" style="background:var(--provider-aws)">AW</span>
+          <span class="provider-chip" style="background:var(--provider-azure)">AZ</span>
+          <span class="provider-chip" style="background:var(--provider-gcp)">GC</span>
+          <span class="provider-chip" style="background:var(--provider-alibaba)">AL</span>
+          <span class="provider-chip" style="background:var(--provider-huawei)">HW</span>
+          <span class="provider-chip" style="background:var(--provider-openai)">AI</span>
+          <span class="provider-chip" style="background:var(--provider-whatsapp)">WA</span>
+        </div>
+        <button class="btn btn-primary role-write" data-open-add-account>+ Add cloud account</button>
+      </div>
+    </header>
+
+    <div class="trial-banner" id="trial-banner" hidden>
+      <div class="trial-banner-inner">
+        <span class="trial-ic">🎉</span>
+        <span class="trial-text"><strong>Free trial — <span data-trial="days-left">4 days left</span>.</strong> Pick a plan before <span data-trial="end-date">Aug 18, 2026</span> to keep your data flowing — plans start at just $25/mo.</span>
+        <a href="billing.html" class="btn btn-sm btn-primary">Choose a plan</a>
+        <button class="trial-close" id="trial-close" aria-label="Dismiss">✕</button>
+      </div>
+    </div>
+
+    <main class="content">
+
+      <!-- Stat tiles -->
+      <section class="stat-grid">
+        <div class="stat-tile">
+          <div class="label">Spend, month to date</div>
+          <div class="value" id="stat-mtd-spend"><span class="sk"></span></div>
+          <div class="row">
+            <span class="delta flat" id="stat-mtd-spend-sub"><span class="sk sk-text"></span></span>
+          </div>
+          <!-- Populated only where the workspace records Adhoc Spend; with no
+               hand-entered subscriptions the total is entirely cloud and the
+               split says nothing. -->
+          <div class="row stat-split-row" id="stat-mtd-split-row" hidden>
+            <span class="stat-split" id="stat-mtd-split"></span>
+          </div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">Projected month-end</div>
+          <div class="value" id="stat-projected"><span class="sk"></span></div>
+          <div class="row">
+            <span class="delta flat" id="stat-projected-sub"><span class="sk sk-text"></span></span>
+          </div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">Active anomalies</div>
+          <div class="value" id="stat-anomalies"><span class="sk"></span></div>
+          <div class="row">
+            <span class="delta flat" id="stat-anomalies-sub"><span class="sk sk-text"></span></span>
+          </div>
+          <!-- Its own line rather than appended to the severity breakdown:
+               three counts and a currency amount on one line wrap the tile. -->
+          <div class="row stat-split-row" id="stat-anomalies-impact-row" hidden>
+            <span class="stat-split" id="stat-anomalies-impact"></span>
+          </div>
+        </div>
+        <div class="stat-tile">
+          <div class="label">Connected accounts</div>
+          <div class="value" id="stat-accounts"><span class="sk"></span></div>
+          <div class="row">
+            <span class="delta flat" id="stat-accounts-sub"><span class="sk sk-text"></span></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chart + Alerts preview -->
+      <section class="grid-2">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Cost trend by provider</h2>
+              <p id="trend-sub">Spend across your connected accounts</p>
+            </div>
+            <div class="seg-control" id="trend-granularity">
+              <button data-gran="daily" data-days="7">7D</button>
+              <button data-gran="daily" data-days="30" class="active">30D</button>
+              <button data-gran="monthly">6M</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- Inside card-body so these line up with the card's heading;
+                 as a direct child of the card they sat 20px further left. -->
+            <div id="trend-daily-stats" class="month-compare-stats" style="display:none">
+              <div class="mcs-item">
+                <div class="l">Yesterday</div>
+                <div class="v" id="trend-yesterday">—</div>
+              </div>
+              <div class="mcs-item">
+                <div class="l">vs prior 7-day avg</div>
+                <div class="delta flat" id="trend-yesterday-delta">—</div>
+              </div>
+              <div class="mcs-item">
+                <div class="l">Daily average</div>
+                <div class="v" id="trend-daily-avg">—</div>
+              </div>
+              <div class="mcs-item">
+                <div class="l">Today so far</div>
+                <div class="v" id="trend-today">—</div>
+              </div>
+            </div>
+            <div id="trend-chart"><span class="sk sk-block" style="height:260px"></span></div>
+          </div>
+          <!-- Legend is built from the providers actually present in the data -->
+          <div class="legend" id="trend-legend"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Recent anomalies</h2>
+              <p>Anomaly detection vs learned baseline</p>
+            </div>
+          </div>
+          <div class="card-body" id="recent-anomalies-list" aria-busy="true">
+              <div class="sk-row" style="padding-left:0;padding-right:0">
+                <div class="sk-grow">
+                  <span class="sk sk-text" style="width:62%;margin-bottom:6px"></span>
+                  <span class="sk sk-text" style="width:38%"></span>
+                </div>
+                <span class="sk sk-text" style="width:48px"></span>
+              </div>
+              <div class="sk-row" style="padding-left:0;padding-right:0">
+                <div class="sk-grow">
+                  <span class="sk sk-text" style="width:62%;margin-bottom:6px"></span>
+                  <span class="sk sk-text" style="width:38%"></span>
+                </div>
+                <span class="sk sk-text" style="width:48px"></span>
+              </div>
+              <div class="sk-row" style="padding-left:0;padding-right:0">
+                <div class="sk-grow">
+                  <span class="sk sk-text" style="width:62%;margin-bottom:6px"></span>
+                  <span class="sk sk-text" style="width:38%"></span>
+                </div>
+                <span class="sk sk-text" style="width:48px"></span>
+              </div>
+          </div>
+          <div class="footer-link-row">
+            <a class="link-btn" href="alerts.html">View all alerts →</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Provider breakdown + table -->
+      <section class="grid-2">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Cost by service</h2>
+              <p>Top resource groups, month to date</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+                <tr><th>Service</th><th class="num">MTD spend</th><th class="num">vs same period</th><th class="num">Accounts</th></tr>
+              </thead>
+              <tbody id="top-services-body">
+                <tr><td><span class="sk sk-text" style="width:62%"></span></td>
+                    <td class="num"><span class="sk sk-text" style="width:56px;margin-left:auto"></span></td>
+                    <td class="num"><span class="sk sk-text" style="width:44px;margin-left:auto"></span></td>
+                    <td><span class="sk sk-text" style="width:72px"></span></td></tr>
+                <tr><td><span class="sk sk-text" style="width:62%"></span></td>
+                    <td class="num"><span class="sk sk-text" style="width:56px;margin-left:auto"></span></td>
+                    <td class="num"><span class="sk sk-text" style="width:44px;margin-left:auto"></span></td>
+                    <td><span class="sk sk-text" style="width:72px"></span></td></tr>
+                <tr><td><span class="sk sk-text" style="width:62%"></span></td>
+                    <td class="num"><span class="sk sk-text" style="width:56px;margin-left:auto"></span></td>
+                    <td class="num"><span class="sk sk-text" style="width:44px;margin-left:auto"></span></td>
+                    <td><span class="sk sk-text" style="width:72px"></span></td></tr>
+                <tr><td><span class="sk sk-text" style="width:62%"></span></td>
+                    <td class="num"><span class="sk sk-text" style="width:56px;margin-left:auto"></span></td>
+                    <td class="num"><span class="sk sk-text" style="width:44px;margin-left:auto"></span></td>
+                    <td><span class="sk sk-text" style="width:72px"></span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Spend by provider</h2>
+              <p>Share of month-to-date total</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="provider-list" id="spend-by-provider-list" aria-busy="true">
+              <div class="sk-row" style="padding-left:0;padding-right:0">
+                <span class="sk" style="width:12px;height:12px;border-radius:3px"></span>
+                <div class="sk-grow"><span class="sk sk-text" style="width:45%"></span></div>
+                <span class="sk sk-text" style="width:60px"></span>
+              </div>
+              <div class="sk-row" style="padding-left:0;padding-right:0">
+                <span class="sk" style="width:12px;height:12px;border-radius:3px"></span>
+                <div class="sk-grow"><span class="sk sk-text" style="width:45%"></span></div>
+                <span class="sk sk-text" style="width:60px"></span>
+              </div>
+              <div class="sk-row" style="padding-left:0;padding-right:0">
+                <span class="sk" style="width:12px;height:12px;border-radius:3px"></span>
+                <div class="sk-grow"><span class="sk sk-text" style="width:45%"></span></div>
+                <span class="sk sk-text" style="width:60px"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cost by region -->
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Cost by region</h2>
+            <p id="region-sub">Where your month-to-date spend is running across providers</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="provider-list" id="region-list" aria-busy="true">
+              <div class="sk-row" style="padding-left:0;padding-right:0">
+                <span class="sk" style="width:12px;height:12px;border-radius:3px"></span>
+                <div class="sk-grow"><span class="sk sk-text" style="width:48%"></span></div>
+                <span class="sk sk-text" style="width:60px"></span>
+              </div>
+              <div class="sk-row" style="padding-left:0;padding-right:0">
+                <span class="sk" style="width:12px;height:12px;border-radius:3px"></span>
+                <div class="sk-grow"><span class="sk sk-text" style="width:48%"></span></div>
+                <span class="sk sk-text" style="width:60px"></span>
+              </div>
+              <div class="sk-row" style="padding-left:0;padding-right:0">
+                <span class="sk" style="width:12px;height:12px;border-radius:3px"></span>
+                <div class="sk-grow"><span class="sk sk-text" style="width:48%"></span></div>
+                <span class="sk sk-text" style="width:60px"></span>
+              </div>
+              <div class="sk-row" style="padding-left:0;padding-right:0">
+                <span class="sk" style="width:12px;height:12px;border-radius:3px"></span>
+                <div class="sk-grow"><span class="sk sk-text" style="width:48%"></span></div>
+                <span class="sk sk-text" style="width:60px"></span>
+              </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script src="providers.js?v=191"></script>
+<script src="accounts-data.js?v=191"></script>
+<script src="adhoc-catalog.js?v=197"></script>
+<script src="adhoc-items.js?v=193"></script>
+<script src="add-account.js?v=197"></script>
+<script src="app.js?v=191"></script>
+<script src="dashboard-summary.js?v=200"></script>
+<!-- Which accounts a service's cost is spread across -->
+<div class="modal-overlay" id="svc-overlay">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="svc-modal-title" style="max-width:520px">
+    <button class="modal-close" id="svc-modal-close" aria-label="Close">✕</button>
+    <div class="service-modal-head">
+      <span class="provider-dot" id="svc-modal-dot"></span>
+      <div>
+        <h2 id="svc-modal-title">Service</h2>
+        <p class="modal-sub" id="svc-modal-sub"></p>
+      </div>
+    </div>
+    <div class="provider-list" id="svc-modal-list"></div>
+  </div>
+</div>
+
+</body>
+</html>

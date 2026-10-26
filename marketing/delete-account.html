@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delete your account · CloudMeter</title>
+<meta name="description" content="How to delete your CloudMeter account and data.">
+<style>
+/* Shared styles for CloudMeter's legal and support pages. */
+:root {
+  --brand: #2a78d6;
+  --brand-dark: #184f95;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --line: #e1e0d9;
+  --page: #f5f6f4;
+  --card: #ffffff;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.top { background: #0d1420; padding: 14px 20px; }
+.brand { color: #fff; text-decoration: none; font-weight: 700; font-size: 18px; display: inline-flex; align-items: center; gap: 8px; }
+.brand .mark {
+  display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-dark)); font-size: 16px;
+}
+main {
+  max-width: 760px; margin: 24px auto 48px; padding: 28px 24px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+}
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 8px; }
+h2 { font-size: 20px; margin: 32px 0 8px; }
+h3 { font-size: 16px; margin: 20px 0 4px; }
+.meta { color: var(--ink-2); font-size: 14px; margin: 0 0 20px; }
+.lead { font-size: 17px; color: var(--ink-2); }
+a { color: var(--brand); }
+ul, ol { padding-left: 22px; }
+li { margin: 4px 0; }
+.callout { background: #eaf1fc; border: 1px solid #c9dcf6; border-radius: 12px; padding: 12px 16px; margin: 16px 0; }
+details { border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; margin: 8px 0; }
+summary { cursor: pointer; font-weight: 600; }
+details p { margin: 8px 0 2px; color: var(--ink-2); }
+.links { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink-2); }
+@media (max-width: 600px) {
+  main { margin: 0; border-radius: 0; border-left: 0; border-right: 0; padding: 20px 16px; }
+  h1 { font-size: 26px; }
+}
+</style>
+</head>
+<body>
+<header class="top"><a class="brand" href="https://www.cloudmeter.io"><span class="mark">☁</span> CloudMeter</a></header>
+<main>
+<h1>Delete your CloudMeter account</h1>
+<p class="lead">CloudMeter is provided by Mobil80 Solutions and Services Private Limited ("Mobil80"). You can remove yourself from a workspace, or — if you are its Owner — permanently delete a whole workspace and all its data.</p>
+
+<div class="callout">
+  <strong>Cancel your subscription first.</strong> Deleting a workspace does not by itself cancel a subscription bought on the web. Cancel it using the link in your receipt email or in the portal under Billing before you delete.
+</div>
+
+<h2>If you own the workspace: delete it and all its data</h2>
+<p>Only a workspace's Owner can delete it. Deletion is done on the CloudMeter web portal, where you can also cancel your plan first. In the mobile app, <strong>More → Delete account</strong> takes you there.</p>
+<ol>
+  <li>Sign in to the CloudMeter portal at <a href="https://portal.cloudmeter.io">portal.cloudmeter.io</a> (or tap <strong>More → Delete account → Open portal settings</strong> in the app).</li>
+  <li>If you have a paid plan, cancel it under <strong>Billing</strong>.</li>
+  <li>Go to <strong>Settings</strong> and scroll to <strong>Close this CloudMeter account</strong>.</li>
+  <li>Type <strong>DELETE</strong> and choose <strong>Close account permanently</strong>.</li>
+</ol>
+<p>Deletion happens immediately and cannot be undone, and you are signed out. We delete, in this order:</p>
+<ul>
+  <li>all connected cloud credentials (AWS, Azure, Google Cloud, OpenAI, WhatsApp and others);</li>
+  <li>all workspace data — cost history, alerts, notification settings, team members and invitations;</li>
+  <li>the sign-in logins of people whose only workspace this was.</li>
+</ul>
+
+<h2>If you are an Admin or Member</h2>
+<p>You can't delete a workspace you don't own — if you tap <strong>More → Delete account</strong> in the app, it tells you to contact the Owner (and, for Admins, shows who that is). To delete the workspace and its data, contact its Owner.</p>
+<p>To leave a workspace instead, ask the Owner to remove you from <strong>Team</strong> in the portal, or email us (below) and we will remove you. Your access and your personal notification settings for that workspace are deleted. The workspace itself, which belongs to its Owner, is not affected.</p>
+
+<h2>Delete your login and personal data by email</h2>
+<p>If you can't use the portal, or want your login removed from every workspace, email <a href="mailto:neeta@mobil80.com">neeta@mobil80.com</a> from the address you sign in with, with the subject "Delete my account". We will confirm your identity with a one-time code and complete the deletion within 7 days.</p>
+
+<h2>What we keep, and for how long</h2>
+<ul>
+  <li><strong>Invoices and payment records</strong> — kept as long as tax and accounting law requires (8 years). Card details are held by our payment providers, never by us.</li>
+  <li><strong>Raw cost exports</strong> — held in an encrypted archive that deletes itself within 90 days.</li>
+  <li><strong>Security logs</strong> — kept for up to 90 days, then deleted.</li>
+</ul>
+<p>Deleting the CloudMeter app from your phone does not delete your account.</p>
+
+<footer class="links"><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Use</a> · <a href="support.html">Support</a></footer>
+</main>
+</body>
+</html>

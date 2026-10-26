@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in — CloudMeter</title>
+<meta name="description" content="Sign in or start your free 7-day CloudMeter trial with just an email address.">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMmE3OGQ2Ii8+PHRleHQgeD0iNTAiIHk9IjY4IiBmb250LXNpemU9IjU4IiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXdlaWdodD0iODAwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5DPC90ZXh0Pjwvc3ZnPg==">
+<link rel="stylesheet" href="styles.css?v=209">
+<script src="file-protocol-guard.js?v=186"></script>
+<script src="ui-guard.js?v=186"></script>
+<script src="config.js?v=186"></script>
+<script src="session.js?v=186"></script>
+<script src="cognito-client.js?v=186"></script>
+</head>
+<body>
+
+<div class="auth-shell">
+  <div class="auth-card">
+    <a class="auth-brand" id="brand-home-link" href="#" title="Back to CloudMeter home">
+      <span class="mark">CM</span>
+      <span>
+        <span class="name">CloudMeter</span>
+        <span class="tag">cloud cost ledger</span>
+      </span>
+    </a>
+
+    <div class="auth-tabs" id="auth-tabs">
+      <button data-mode="signup" class="active">Sign up</button>
+      <button data-mode="signin">Sign in</button>
+    </div>
+
+    <span class="auth-badge" id="auth-badge">🎉 7-day free trial · No credit card required</span>
+
+    <div class="auth-toast" id="resend-toast">✓ New code sent.</div>
+
+    <!-- STEP — SIGN UP -->
+    <div class="auth-step active" id="step-signup">
+      <h1>Start your free trial</h1>
+      <p class="sub">7 days, full access, every provider. Cancel anytime — no card needed to start.</p>
+
+      <label class="field-label" for="signup-name">Full name</label>
+      <input class="field-input" type="text" id="signup-name" placeholder="Alex Taylor" autocomplete="name" style="margin-bottom:14px">
+
+      <label class="field-label" for="signup-company">Business / organization name</label>
+      <input class="field-input" type="text" id="signup-company" placeholder="Acme Inc." autocomplete="organization" maxlength="80" style="margin-bottom:14px">
+
+      <label class="field-label" for="signup-email">Work email</label>
+      <input class="field-input" type="email" id="signup-email" placeholder="you@company.com" autocomplete="email">
+      <div class="field-error" id="signup-error">Enter your name, your company name and a valid work email.</div>
+
+      <button class="btn btn-primary btn-block" id="signup-btn">Start free trial</button>
+    </div>
+
+    <!-- STEP — SIGN IN -->
+    <div class="auth-step" id="step-email">
+      <h1>Sign in</h1>
+      <p class="sub">Enter your work email and we'll send a one-time code — no password needed.</p>
+
+      <label class="field-label" for="email-input">Work email</label>
+      <input class="field-input" type="email" id="email-input" placeholder="you@company.com" autocomplete="email">
+      <div class="field-error" id="email-error">Enter a valid email address.</div>
+
+      <button class="btn btn-primary btn-block" id="send-otp-btn">Send code</button>
+    </div>
+
+    <!-- STEP — OTP (shared by sign up + sign in) -->
+    <div class="auth-step" id="step-otp">
+      <h1 id="otp-title">Enter your code</h1>
+      <p class="sub" id="otp-sub">We sent a 6-digit code to <strong id="otp-email-target">you@company.com</strong></p>
+
+      <label class="field-label">One-time code</label>
+      <div class="otp-row">
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+      </div>
+      <div class="field-error" id="otp-error">That code didn't work — try again.</div>
+
+      <button class="btn btn-primary btn-block" id="verify-btn">Verify &amp; continue</button>
+
+      <div class="auth-links">
+        <button class="back-link" id="back-btn">← Use a different email</button>
+        <button id="resend-btn">Resend code</button>
+      </div>
+
+      <div class="demo-note">Don't see it? Check your spam or junk folder — the code arrives from <strong>no-reply@cloudmeter.io</strong>.</div>
+    </div>
+  </div>
+</div>
+
+<script src="login.js?v=186"></script>
+</body>
+</html>

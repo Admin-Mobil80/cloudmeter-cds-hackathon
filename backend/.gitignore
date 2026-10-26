@@ -1,0 +1,18 @@
+*.js
+!jest.config.js
+*.d.ts
+node_modules
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+cdk.out.*
+# The WhatsApp assistant's agent, bundled at synth for AgentCore (lib/assistant-stack.ts).
+.build
+
+# macOS Finder writes one of these into every folder it opens, recording the
+# window size and sort order for whoever opened it. Two people's copies never
+# match, so committing it turns every commit into a possible merge conflict
+# about nothing. Nothing here packages it — the Lambdas are bundled by esbuild
+# from named entry files — so removing it changes no synthesised template.
+.DS_Store

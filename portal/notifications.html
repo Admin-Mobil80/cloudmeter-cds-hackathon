@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudMeter — Notifications</title>
+<meta name="description" content="Choose how and when CloudMeter alerts you — connect Email and WhatsApp, and set your own anomaly alert and daily digest preferences.">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcng9IjIyIiBmaWxsPSIjMmE3OGQ2Ii8+PHRleHQgeD0iNTAiIHk9IjY4IiBmb250LXNpemU9IjU4IiBmb250LWZhbWlseT0ic3lzdGVtLXVpIiBmb250LXdlaWdodD0iODAwIiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5DPC90ZXh0Pjwvc3ZnPg==">
+<link rel="stylesheet" href="styles.css?v=209">
+<script src="file-protocol-guard.js?v=186"></script>
+<script src="ui-guard.js?v=186"></script>
+<script src="config.js?v=186"></script>
+<script src="session.js?v=186"></script>
+<script src="cognito-client.js?v=186"></script>
+<script src="api-client.js?v=186"></script>
+<script src="auth-guard.js?v=186"></script>
+<script src="money.js?v=186"></script>
+<script src="trial.js?v=186"></script>
+<script src="sync-banner.js?v=186"></script>
+</head>
+<body>
+<div class="app-shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="mark">CM</span>
+      <span>
+        <span class="name">CloudMeter</span>
+        <span class="tag">&nbsp;</span>
+      </span>
+    </div>
+
+    <nav class="nav-group">
+      <span class="nav-label">Monitor</span>
+      <a class="nav-link" href="dashboard.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-link" href="accounts.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"/><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>
+        Cloud Accounts
+      </a>
+      <a class="nav-link" href="alerts.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Alerts
+        <span class="count" data-alert-count hidden></span>
+      </a>
+      <a class="nav-link" href="pricing.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.6 13.4 12 22l-9-9V4a1 1 0 0 1 1-1h9l7.6 7.6a2 2 0 0 1 0 2.8Z"/><circle cx="7.6" cy="7.6" r="1.3"/></svg>
+        Provider Pricing
+      </a>
+      <span class="nav-label">CloudMeter Account</span>
+      <a class="nav-link" href="team.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Team
+      </a>
+      <a class="nav-link active" href="notifications.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="4" y1="7" x2="20" y2="7"/><circle cx="9" cy="7" r="2"/><line x1="4" y1="14" x2="20" y2="14"/><circle cx="16" cy="14" r="2"/><line x1="4" y1="21" x2="20" y2="21"/><circle cx="9" cy="21" r="2"/></svg>
+        Notifications
+      </a>
+      <a class="nav-link role-manage-only" href="billing.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>
+        Billing &amp; Plan
+      </a>
+      <a class="nav-link role-manage-only" href="settings.html">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.56-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="avatar">&nbsp;</span>
+      <span class="who">
+        <span class="n">&nbsp;</span>
+        <span class="r">&nbsp;</span>
+      </span>
+      <button class="icon-btn-ghost" id="logout-btn" title="Sign out" aria-label="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <h1>Notifications</h1>
+        <p class="sub">Choose how and when CloudMeter alerts you, personally — everyone sets their own</p>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Channels -->
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Your channels</h2>
+            <p>Connect the channels you want alerts delivered to, and choose what goes where</p>
+          </div>
+          <span class="save-confirm" id="channels-confirm">✓ Saved</span>
+        </div>
+        <div class="card-body">
+
+          <div class="channel-row">
+            <span class="channel-icon-visual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3 7 9 6 9-6"/></svg></span>
+            <div class="channel-info">
+              <div class="name">Email</div>
+              <div class="status connected" id="email-status">—</div>
+            </div>
+          </div>
+
+          <div class="channel-row">
+            <span class="channel-icon-visual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 1 1-4.08-7.26L21 3l-1.02 3.78A8.46 8.46 0 0 1 21 11.5Z"/></svg></span>
+            <div class="channel-info">
+              <div class="name">WhatsApp</div>
+              <div class="status" id="whatsapp-status">Not connected</div>
+            </div>
+            <button class="btn btn-sm" id="whatsapp-connect-btn">Connect WhatsApp</button>
+          </div>
+
+          <!-- Slack needs no code to verify, unlike WhatsApp: the workspace
+               has already installed CloudMeter, and Slack is asked to match
+               this person's own verified email to an account in it. So there
+               is a button and no dialog. -->
+          <div class="channel-row">
+            <span class="channel-icon-visual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3a2 2 0 0 0 0 4h2V5a2 2 0 0 0-2-2Z"/><path d="M5 9a2 2 0 0 0 0 4h6a2 2 0 1 0 0-4H5Z"/><path d="M15 21a2 2 0 0 0 0-4h-2v2a2 2 0 0 0 2 2Z"/><path d="M19 15a2 2 0 0 0 0-4h-6a2 2 0 1 0 0 4h6Z"/></svg></span>
+            <div class="channel-info">
+              <div class="name">Slack</div>
+              <div class="status" id="slack-status">Not connected</div>
+            </div>
+            <button class="btn btn-sm" id="slack-connect-btn">Connect Slack</button>
+          </div>
+
+          <!-- Installing CloudMeter into the company's Slack, which is a
+               separate thing from one person connecting themselves: it grants
+               posting rights and member-list access for the whole workspace,
+               so only an Owner or Admin sees it. Hidden until the page knows
+               the caller's role. -->
+          <p class="channel-note" id="slack-install-note" hidden>
+            <span id="slack-install-text">Nobody has set up Slack for this workspace yet.</span>
+            <button type="button" class="linkish" id="slack-install-btn">Install CloudMeter in your Slack</button>
+          </p>
+
+          <!-- Which messages go by which route. Email used to be fixed on
+               with "Email is always sent" printed beneath, so anyone who
+               wanted WhatsApp instead had no way to say so — and before the
+               WhatsApp column existed at all, nine users sat verified, on the
+               digest, silently off spike alerts, with nothing on screen
+               explaining it. Both are choices now, and either may be off. -->
+          <div class="delivery" id="delivery">
+            <!-- data-head lets a column be labelled when the plan withholds
+                 it, so the explanation sits once above the column rather than
+                 repeated on every row. -->
+            <div class="delivery-head">
+              <span></span>
+              <span data-head="email">Email</span>
+              <span data-head="whatsapp">WhatsApp</span>
+              <span data-head="slack">Slack</span>
+            </div>
+
+            <div class="delivery-row" data-row="anomaly">
+              <span class="w">
+                <span class="n">Spike alerts</span>
+                <span class="d">Sent when a cost jumps unexpectedly</span>
+              </span>
+              <span class="c"><input type="checkbox" data-group="anomaly" data-channel="email"
+                     aria-label="Spike alerts by email"></span>
+              <span class="c"><input type="checkbox" data-group="anomaly" data-channel="whatsapp"
+                     aria-label="Spike alerts by WhatsApp"></span>
+              <span class="c"><input type="checkbox" data-group="anomaly" data-channel="slack"
+                     aria-label="Spike alerts by Slack"></span>
+              <p class="delivery-warn" data-warn="anomaly" hidden></p>
+            </div>
+
+            <div class="delivery-row" data-row="digest">
+              <span class="w">
+                <span class="n">Daily digest</span>
+                <span class="d">One summary of yesterday's spend, trends and open anomalies</span>
+                <!-- When it goes out, filled in from the account's settings.
+                     It sits on the row it describes rather than in a card of
+                     its own: the card held one read-only sentence, and a
+                     reader asking "what is this and when does it arrive?"
+                     had to look in two places to answer it. -->
+                <span class="d" id="digest-timing">Loading…</span>
+              </span>
+              <span class="c"><input type="checkbox" data-group="digest" data-channel="email"
+                     aria-label="Daily digest by email"></span>
+              <span class="c"><input type="checkbox" data-group="digest" data-channel="whatsapp"
+                     aria-label="Daily digest by WhatsApp"></span>
+              <span class="c"><input type="checkbox" data-group="digest" data-channel="slack"
+                     aria-label="Daily digest by Slack"></span>
+              <p class="delivery-warn" data-warn="digest" hidden></p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Per-account alert switches -->
+      <section class="card" id="member-accounts-card" hidden>
+        <div class="card-head">
+          <div>
+            <h2>Your cloud accounts</h2>
+            <p>Choose what each account tells you. These go to the channels above.</p>
+          </div>
+          <div class="acct-notify-bulk">
+            <span class="save-confirm" id="member-accounts-confirm">✓ Saved</span>
+            <button type="button" class="link-btn-sm" data-notify-all>Turn all on</button>
+            <button type="button" class="link-btn-sm" data-notify-none>Turn all off</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="acct-notify-head">
+            <span class="a">Cloud account</span>
+            <span class="c">Anomalies</span>
+            <span class="c">Daily digest</span>
+          </div>
+          <div id="member-accounts-list"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+</div>
+
+<!-- WhatsApp connect modal (mock, reuses OTP pattern) -->
+<div class="modal-overlay" id="whatsapp-overlay">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-label="Connect WhatsApp" style="max-width:420px">
+    <button class="modal-close" id="whatsapp-close" aria-label="Close">✕</button>
+
+    <div id="wa-step-phone">
+      <h2 style="font-size:17px;margin:0 0 6px">Connect WhatsApp</h2>
+      <p class="modal-sub">We'll send a code to verify this number.</p>
+      <label class="field-label" for="wa-phone-input">Phone number</label>
+      <div style="display:grid;grid-template-columns:minmax(0,150px) 1fr;gap:8px">
+        <select class="field-input" id="wa-country-code" aria-label="Country code"></select>
+        <input class="field-input" id="wa-phone-input" inputmode="tel" autocomplete="tel-national"
+               placeholder="98765 43210" aria-label="Phone number without country code">
+      </div>
+      <div class="field-error" id="wa-phone-error">Enter a valid phone number.</div>
+      <p class="muted" style="font-size:12px;margin:8px 0 0" id="wa-phone-preview"></p>
+      <button class="btn btn-primary btn-block" id="wa-send-code-btn" style="margin-top:16px">Send code</button>
+      <div class="demo-note" id="wa-from-note">Verification not enabled yet — no code is sent.</div>
+    </div>
+
+    <div id="wa-step-otp" style="display:none">
+      <h2 style="font-size:17px;margin:0 0 6px">Enter your code</h2>
+      <p class="modal-sub">We sent a 6-digit code to <strong id="wa-phone-target">—</strong></p>
+      <div class="otp-row">
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+        <input class="otp-box" inputmode="numeric" maxlength="1" />
+      </div>
+      <div class="field-error" id="wa-otp-error">Enter all 6 digits to continue.</div>
+      <button class="btn btn-primary btn-block" id="wa-verify-btn" style="margin-top:16px">Verify &amp; connect</button>
+      <div class="demo-note">Design prototype — enter any 6 digits to continue.</div>
+    </div>
+  </div>
+</div>
+
+<script src="dial-codes.js?v=186"></script>
+<script src="notifications.js?v=208"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+# macOS Finder writes one of these into every folder it opens, recording the
+# window size, icon positions and sort order for whoever opened it. It has
+# nothing to do with the site, and two people's copies always differ — so
+# committing it produced merge conflicts about nothing but window settings.
+#
+# It also reached the dev bucket once and was downloadable at
+# dev.portal.cloudmeter.io/.DS_Store, listing the hidden folder names beside it.
+.DS_Store
