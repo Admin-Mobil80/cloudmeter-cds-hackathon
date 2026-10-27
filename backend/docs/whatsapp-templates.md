@@ -1,7 +1,7 @@
 # CloudMeter — WhatsApp message templates
 
 **Status: all four submitted to Meta on 2026-08-20**, on the shared `Partner`
-WhatsApp Business Account (id `<partner-waba-id>`, sender +91 XXXXX XXXXX) while
+WhatsApp Business Account (id `1538908081173274`, sender +91 78994 44028) while
 CloudMeter waits for its own number.
 
 | Template | Category | Language | Status on submission |

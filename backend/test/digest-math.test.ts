@@ -163,7 +163,7 @@ describe('regression: real prod figures for 31 Aug 2026', () => {
     expect(s.monthDeltaPct!).toBeCloseTo(12.88, 1);
   });
 
-  it('Wayne Health: $9.84 day, $236.13 MTD, -40%', () => {
+  it('RCS Health: $9.84 day, $236.13 MTD, -40%', () => {
     const rows = [...flat('2026-07', 31, 394.36 / 31), ...flat('2026-08', 30, (236.13 - 9.84) / 30),
                   { dayKey: '2026-08-31', totalSpend: 9.84 }];
     const s = summarise(rows, '2026-08-31');

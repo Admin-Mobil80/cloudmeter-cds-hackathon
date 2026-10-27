@@ -40,6 +40,9 @@ resource, and the Lambda functions that run CloudMeter. It is live at
    - *Compare last week with the week before*
    - *Any cost spikes?*
    - *Delete my AWS account* — it explains it can only read.
+   - *invite* — walks you through inviting a teammate (workspace, email,
+     Member or Admin). The demo workspace is read-only, so the last step says
+     no invitation was sent.
 
 A number that is not linked to a CloudMeter login gets a message saying how to
 link it, and nothing else.
@@ -67,6 +70,8 @@ WhatsApp ◄─ AWS End User Messaging Social ◄─ SendWhatsAppMessage (reply)
 | Read-only tools: spend summary, account lookup, service and tag costs, alerts, daily spend, all-workspace answers | [`functions/assistant/tools.ts`](functions/assistant/tools.ts) |
 | Matching what people type to billed names (S3 → Amazon Simple Storage Service) | [`functions/assistant/names.ts`](functions/assistant/names.ts) |
 | Which workspace a question is about | [`functions/assistant/workspace-choice.ts`](functions/assistant/workspace-choice.ts) |
+| Team invites typed on WhatsApp ("invite" → workspace → email → Member or Admin) | [`functions/assistant/invite-flow.ts`](functions/assistant/invite-flow.ts) |
+| The invite itself, shared with the portal's Team page and emailed through Amazon SES | [`functions/shared/team-invite.ts`](functions/shared/team-invite.ts) |
 | Infrastructure: SNS topic, Lambda, AgentCore runtime, IAM, alarm | [`lib/assistant-stack.ts`](lib/assistant-stack.ts) |
 
 What it guarantees:
@@ -81,10 +86,14 @@ What it guarantees:
 - **Many workspaces.** For someone in several workspaces, a question is answered
   for all of them, one line each, unless they name one. `switch to <name>` pins
   a workspace, `all` releases it.
+- **Acts only after you confirm.** The AI agent never changes anything. A team
+  invite started with "invite" runs as plain code in the inbound Lambda, not
+  in the agent, and is sent — as an email through Amazon SES — only after the
+  Owner or Admin chooses Member or Admin. It applies the portal's own checks.
 - **Cannot loop.** Delivery receipts and our own number are dropped before
   anything runs, every message id is handled once, 20 questions an hour per
-  number, no retries, reserved concurrency of 5, and a CloudWatch alarm on the
-  invocation count.
+  number (invite steps have their own 40), no retries, reserved concurrency of
+  5, and a CloudWatch alarm on the invocation count.
 
 ## Where Amazon SES is used
 
@@ -193,7 +202,7 @@ next to this folder in this repository:
 ```bash
 npm install
 npm run build        # type-check
-npm test             # 44 Jest suites, 592 tests, no AWS access needed
+npm test             # 48 Jest suites, 663 tests, no AWS access needed
 npx cdk synth        # synthesize CloudFormation templates
 ```
 

@@ -110,7 +110,7 @@ describe('one row per person', () => {
    *
    * The head count was never wrong — subscriberCount counts distinct people —
    * so a duplicate is invisible in every figure and visible only in the list,
-   * where it reads "lavanya, lavanya" and looks like the record is wrong about
+   * where it reads "lena, lena" and looks like the record is wrong about
    * who is on it.
    */
   it('stores one row for a name given twice', () => {

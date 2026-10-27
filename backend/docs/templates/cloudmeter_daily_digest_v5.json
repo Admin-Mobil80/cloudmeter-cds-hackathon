@@ -1,0 +1,36 @@
+{
+  "name": "cloudmeter_daily_digest_v5",
+  "language": "en",
+  "category": "UTILITY",
+  "parameter_format": "POSITIONAL",
+  "components": [
+    {
+      "type": "HEADER",
+      "format": "TEXT",
+      "text": "CloudMeter daily summary for {{1}}",
+      "example": { "header_text": ["WONKA"] }
+    },
+    {
+      "type": "BODY",
+      "text": "Spend on {{1}}: {{2}}\nMonth to date: {{3}} ({{4}} vs the same point last month)\nBiggest mover: {{5}}\n\nTop services on {{6}}:\n• {{7}}\n• {{8}}\n• {{9}}\n{{10}}\n\nFull breakdown: portal.cloudmeter.io/dashboard.html",
+      "example": {
+        "body_text": [[
+          "25 Oct 2026",
+          "$6",
+          "$142",
+          "down 1%",
+          "nothing moved unusually",
+          "25 Oct",
+          "AWS: EC2 - Other $1.24",
+          "AWS: Amazon EC2 $0.98",
+          "AWS: Amazon S3 $0.61",
+          "+15 more in the dashboard"
+        ]]
+      }
+    },
+    {
+      "type": "FOOTER",
+      "text": "Manage alerts in CloudMeter → Notifications"
+    }
+  ]
+}

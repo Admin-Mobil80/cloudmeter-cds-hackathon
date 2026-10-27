@@ -761,6 +761,7 @@ a.provider-row:hover .provider-meta { color: var(--brand); }
 .account-row .acc-owner-sep { opacity: 0.55; }
 .link-btn-sm { font-size: 12px; font-weight: 650; color: var(--brand); background: none; border: 0; padding: 0; cursor: pointer; }
 .link-btn-sm:hover { text-decoration: underline; }
+.cancel-subscription { margin-top: 10px; }
 .field-input-sm { width: auto; min-width: 240px; padding: 6px 9px; font-size: 12.5px; }
 .acc-owner-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 3px; }
 .acc-meta .acc-owner-value { color: var(--text-primary); }

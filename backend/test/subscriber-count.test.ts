@@ -28,7 +28,7 @@ describe('subscriberCount', () => {
 
   it('counts a shared line as everyone named on it', () => {
     expect(subscriberCount([
-      item({ type: 'shared', subscribers: ['Neeta', 'Rohan', 'Lavanya', 'Kundan'] }),
+      item({ type: 'shared', subscribers: ['Neeta', 'Rohan', 'Lena', 'Kevin'] }),
     ], NOW)).toBe(4);
   });
 
@@ -44,9 +44,9 @@ describe('subscriberCount', () => {
   it('treats the same name in different case or spacing as one person', () => {
     // The field is typed, and a real workspace already holds both spellings.
     expect(subscriberCount([
-      item({ id: 'a', subscribers: ['Lavanya'] }),
-      item({ id: 'b', subscribers: ['lavanya'] }),
-      item({ id: 'c', subscribers: ['  Lavanya  '] }),
+      item({ id: 'a', subscribers: ['Lena'] }),
+      item({ id: 'b', subscribers: ['lena'] }),
+      item({ id: 'c', subscribers: ['  Lena  '] }),
     ], NOW)).toBe(1);
   });
 
@@ -73,16 +73,16 @@ describe('subscriberCount', () => {
      * running — the count has to agree with the money next to it.
      */
     expect(subscriberCount([
-      item({ id: 'a', subscribers: ['Lavanya'], startsAt: '2026-07-21', endsAt: '2026-09-20' }),
-      item({ id: 'b', subscribers: ['Lavanya'], startsAt: '2026-10-21', endsAt: '2026-11-21' }),
+      item({ id: 'a', subscribers: ['Lena'], startsAt: '2026-07-21', endsAt: '2026-09-20' }),
+      item({ id: 'b', subscribers: ['Lena'], startsAt: '2026-10-21', endsAt: '2026-11-21' }),
     ], NOW)).toBe(0);
   });
 
   it('counts them again once the renewal has started', () => {
     const later = new Date('2026-10-22T12:00:00Z');
     expect(subscriberCount([
-      item({ id: 'a', subscribers: ['Lavanya'], startsAt: '2026-07-21', endsAt: '2026-09-20' }),
-      item({ id: 'b', subscribers: ['Lavanya'], startsAt: '2026-10-21', endsAt: '2026-11-21' }),
+      item({ id: 'a', subscribers: ['Lena'], startsAt: '2026-07-21', endsAt: '2026-09-20' }),
+      item({ id: 'b', subscribers: ['Lena'], startsAt: '2026-10-21', endsAt: '2026-11-21' }),
     ], later)).toBe(1);
   });
 

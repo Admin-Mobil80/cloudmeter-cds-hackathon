@@ -932,7 +932,7 @@
          * One person, one row.
          *
          * Nothing stops the same name being picked twice — the rows are
-         * independent text boxes — and a line reading "lavanya, lavanya" is
+         * independent text boxes — and a line reading "lena, lena" is
          * how it shows up afterwards. The head count is unaffected, since it
          * counts distinct people, so the duplicate is invisible in every
          * figure and visible only in the list, where it looks like the record
@@ -942,7 +942,7 @@
          * usually the second one meant to be somebody else, and dropping it
          * silently would save a line missing a subscriber they thought they
          * had added. Matched case- and space-insensitively, because the box
-         * accepts what is typed — "lavanya" and "Lavanya " are one person.
+         * accepts what is typed — "lena" and "Lena " are one person.
          */
         const seen = new Set();
         const rows = [...root.querySelectorAll('.adhoc-sub-row')];

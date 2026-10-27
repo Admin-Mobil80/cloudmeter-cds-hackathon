@@ -35,6 +35,8 @@ const MOVER_MIN_DELTA_FOR_PCT = 0.20;
 
 export interface DigestMover {
   service: string;
+  /** The account's provider id ('aws', 'openai', …). */
+  provider: string;
   accountName: string;
   spend: number;
   baseline: number;
@@ -44,6 +46,8 @@ export interface DigestMover {
 /** One service's cost on the reported day and month to date, across accounts. */
 export interface DigestService {
   service: string;
+  /** Provider id; the same name under two providers stays two services. */
+  provider: string;
   daySpend: number;
   monthToDate: number;
 }
@@ -210,6 +214,8 @@ export async function buildDigest(
   let currentToSamePoint = 0;
 
   const movers: DigestMover[] = [];
+  // Keyed by provider and name together, so each service keeps its provider.
+  const serviceKey = (provider: string, name: string) => `${provider}\u0000${name}`;
   const serviceDay = new Map<string, number>();
   const serviceMonth = new Map<string, number>();
 
@@ -225,8 +231,9 @@ export async function buildDigest(
       if (key.startsWith(month) && key <= dayKey) {
         monthToDate += spend;
         (d.serviceBreakdown as ServiceBreakdownItem[] | undefined)?.forEach((x) => {
-          serviceMonth.set(x.name, (serviceMonth.get(x.name) ?? 0) + (x.spend ?? 0));
-          if (key === dayKey) serviceDay.set(x.name, (serviceDay.get(x.name) ?? 0) + (x.spend ?? 0));
+          const k = serviceKey(account.provider, x.name);
+          serviceMonth.set(k, (serviceMonth.get(k) ?? 0) + (x.spend ?? 0));
+          if (key === dayKey) serviceDay.set(k, (serviceDay.get(k) ?? 0) + (x.spend ?? 0));
         });
         if (Number(key.slice(8, 10)) <= comparableDays) currentToSamePoint += spend;
       }
@@ -262,7 +269,10 @@ export async function buildDigest(
       : null,
     movers: movers.sort((a, b) => b.delta - a.delta).slice(0, 3),
     services: Array.from(serviceMonth.keys())
-      .map((service) => ({ service, daySpend: serviceDay.get(service) ?? 0, monthToDate: serviceMonth.get(service) ?? 0 }))
+      .map((k) => {
+        const [provider, service] = k.split('\u0000');
+        return { service, provider, daySpend: serviceDay.get(k) ?? 0, monthToDate: serviceMonth.get(k) ?? 0 };
+      })
       .filter((x) => x.daySpend > 0 || x.monthToDate > 0)
       .sort((a, b) => b.daySpend - a.daySpend || b.monthToDate - a.monthToDate),
     accountCount: accounts.length,
@@ -317,6 +327,7 @@ function moversFor(
 
     out.push({
       service: s.name,
+      provider: account.provider,
       accountName: account.name,
       spend: s.spend,
       baseline,

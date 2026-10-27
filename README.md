@@ -30,6 +30,10 @@ Live at [cloudmeter.io](https://cloudmeter.io) — customer portal:
    mobile number and type in the code that arrives on WhatsApp.
 2. Message +91 81058 23737 from that phone, for example *How much did we spend
    this month?*, *s3 cost*, *Production (AWS)*, *Any cost spikes?*
+3. Type *invite* to see a team invite that starts on WhatsApp and finishes in
+   email: CloudMeter asks for the workspace, the person's email and Member or
+   Admin. The demo workspace is read-only, so the last step says no invitation
+   was sent.
 
 ## What's in this repository
 
@@ -49,6 +53,10 @@ Live at [cloudmeter.io](https://cloudmeter.io) — customer portal:
 - Receiving: the WhatsApp Business Account's event destination is an Amazon SNS
   topic that triggers
   [`backend/functions/assistant/whatsapp-inbound`](backend/functions/assistant/whatsapp-inbound/index.ts).
+- Across channels: a team invite typed on WhatsApp
+  ([`backend/functions/assistant/invite-flow.ts`](backend/functions/assistant/invite-flow.ts))
+  is sent as an Amazon SES email by the same function the portal uses
+  ([`backend/functions/shared/team-invite.ts`](backend/functions/shared/team-invite.ts)).
 - IAM: each sender may call `social-messaging:SendWhatsAppMessage` on one
   phone-number ARN only — [`backend/lib/notifications-stack.ts`](backend/lib/notifications-stack.ts),
   [`backend/lib/assistant-stack.ts`](backend/lib/assistant-stack.ts).
@@ -58,7 +66,9 @@ notices; see "Where Amazon SES is used" in the [backend README](backend/README.m
 
 **The AI agent** — [`backend/functions/assistant/`](backend/functions/assistant):
 the AgentCore runtime entry point (`agent/`), its read-only tools (`tools.ts`),
-and the guards that stop the WhatsApp pipeline from ever looping.
+and the guards that stop the WhatsApp pipeline from ever looping. The agent
+never changes anything; team invites run as plain code beside it and are sent
+only after the Owner or Admin confirms the role.
 
 ## About this repository
 

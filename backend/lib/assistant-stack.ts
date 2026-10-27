@@ -20,6 +20,10 @@ export interface AssistantStackProps extends StackProps, EnvProps {
   whatsappAwsPhoneNumberId: string;
   /** Bedrock model or inference profile id. */
   modelId?: string;
+  /** SES-verified sender for the invitations a WhatsApp invite sends. */
+  otpFromEmail: string;
+  /** The portal's address, linked from those invitations. */
+  portalUrl: string;
 }
 
 /**
@@ -160,9 +164,17 @@ export class AssistantStack extends Stack {
         ASSISTANT_HOURLY_LIMIT: '20',
         // See REPLY_TO_UNKNOWN in the handler: only prod answers strangers.
         ASSISTANT_REPLY_TO_UNKNOWN: String(envName === 'prod'),
+        // For team invites started on WhatsApp (functions/assistant/invite-flow.ts).
+        OTP_FROM_EMAIL: props.otpFromEmail,
+        PORTAL_URL: props.portalUrl,
       },
     });
     table.grantReadWriteData(inboundFn);
+    // The invitation email itself, sent the same way the portal's invite sends it.
+    inboundFn.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+      resources: ['*'],
+    }));
     allowAwsWhatsApp(inboundFn, props.whatsappAwsPhoneNumberId);
     inboundFn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['bedrock-agentcore:InvokeAgentRuntime'],

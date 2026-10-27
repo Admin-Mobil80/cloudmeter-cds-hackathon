@@ -71,8 +71,22 @@ function handlerDirs(root = 'functions/api'): string[] {
 }
 
 describe('guard coverage', () => {
-  const guarded = handlerDirs().filter((d) =>
-    readFileSync(join(d, 'index.ts'), 'utf8').includes('requireWritable'));
+  // Shared functions that apply the guard themselves, so a handler that hands
+  // its whole request to one is guarded too. Checked below, so this list
+  // can't vouch for a function that has quietly lost its guard.
+  const GUARDED_SHARED = { createTeamInvite: 'functions/shared/team-invite.ts' };
+  const guarded = handlerDirs().filter((d) => {
+    const src = readFileSync(join(d, 'index.ts'), 'utf8');
+    return src.includes('requireWritable') || Object.keys(GUARDED_SHARED).some((fn) => src.includes(`${fn}(`));
+  });
+
+  it('shared write functions apply the guard themselves', () => {
+    for (const file of Object.values(GUARDED_SHARED)) {
+      const src = readFileSync(join(__dirname, '..', file), 'utf8');
+      expect(src).toContain('requireWritable(caller)');
+      expect(src).toContain('requireRole(caller');
+    }
+  });
 
   /**
    * Deliberately unguarded, each for a reason that would trap someone:

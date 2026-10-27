@@ -13,7 +13,7 @@ import { whereOf } from '../functions/shared/alert-notify';
 const SEP_21 = {
   'gpt-image-1 image, output': [
     { label: 'Rehearse RevenueCat', spend: 16.598 },
-    { label: 'CallCentral RevenueCat', spend: 0.011 },
+    { label: 'Initrode RevenueCat', spend: 0.011 },
     { label: 'Twick RevenueCat', spend: 0.004 },
     { label: 'Speakworld RevenueCat', spend: 0.002 },
   ],

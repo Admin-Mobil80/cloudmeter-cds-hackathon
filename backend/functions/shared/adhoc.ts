@@ -136,8 +136,8 @@ export function hasEnded(item: Pick<AdhocItem, 'endsAt'>, now = new Date()): boo
  *
  * Counts people, not lines: one person on both Pro and a Team seat is one
  * user of the tool, and a shared line naming four people is four. Matched on
- * the trimmed, case-folded name, because the field is typed and "Lavanya" and
- * "lavanya" are plainly the same colleague.
+ * the trimmed, case-folded name, because the field is typed and "Lena" and
+ * "lena" are plainly the same colleague.
  *
  * Today, strictly: a lapsed line does not count, and neither does one that
  * has not begun. Counting future seats was the first attempt, on the argument

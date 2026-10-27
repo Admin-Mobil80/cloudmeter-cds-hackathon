@@ -76,3 +76,5 @@ export function extractInbound(snsMessage: string, ourPhoneNumberId: string): In
   }
   return out;
 }
+
+export const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

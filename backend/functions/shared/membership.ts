@@ -117,6 +117,22 @@ export async function getMembershipForUser(userId: string): Promise<Membership |
     if (match) chosen = match;
   }
 
+  return membershipFrom(chosen);
+}
+
+/**
+ * This person's membership in one particular workspace, or null if they have
+ * no active one there. For callers that already know which workspace they
+ * mean — WhatsApp, where the person names it — rather than the portal's
+ * active one.
+ */
+export async function getMembershipInTenant(userId: string, tenantId: string): Promise<Membership | null> {
+  const row = (await getMembershipsForUser(userId))
+    .find((m) => String(m.PK).replace('TENANT#', '') === tenantId && (!m.status || m.status === 'active'));
+  return row ? membershipFrom(row) : null;
+}
+
+async function membershipFrom(chosen: Record<string, unknown>): Promise<Membership> {
   const tenantId = String(chosen.PK).replace('TENANT#', '');
   const { Item: tenant } = await ddb.send(new GetCommand({
     TableName: TABLE_NAME,

@@ -1,0 +1,33 @@
+{
+  "name": "cloudmeter_daily_digest_v3",
+  "language": "en",
+  "category": "UTILITY",
+  "parameter_format": "POSITIONAL",
+  "components": [
+    {
+      "type": "HEADER",
+      "format": "TEXT",
+      "text": "CloudMeter daily summary for {{1}}",
+      "example": { "header_text": ["Mobil80 Solutions"] }
+    },
+    {
+      "type": "BODY",
+      "text": "Spend on {{1}}: {{2}}\nMonth to date: {{3}} ({{4}} vs the same point last month)\nBiggest mover: {{5}}\nTop services on {{6}}: {{7}}\n\nFull breakdown: portal.cloudmeter.io/dashboard.html",
+      "example": {
+        "body_text": [[
+          "24 Oct 2026",
+          "₹2,875",
+          "₹66,210",
+          "up 12%",
+          "OpenAI: GPT Image 2, up ₹203",
+          "24 Oct",
+          "OpenAI: GPT Image 2 ₹218 · OpenAI: GPT-4o mini TTS ₹95 · AWS: Amazon EC2 ₹34 · +19 more"
+        ]]
+      }
+    },
+    {
+      "type": "FOOTER",
+      "text": "Manage alerts in CloudMeter → Notifications"
+    }
+  ]
+}

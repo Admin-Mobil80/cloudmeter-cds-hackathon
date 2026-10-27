@@ -1,13 +1,15 @@
 import { createHash } from 'node:crypto';
 import type { SNSEvent } from 'aws-lambda';
-import { GetCommand, PutCommand, QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { DeleteCommand, GetCommand, PutCommand, QueryCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { BedrockAgentCoreClient, InvokeAgentRuntimeCommand } from '@aws-sdk/client-bedrock-agentcore';
 import { ddb, TABLE_NAME } from '../../shared/ddb';
-import { getMembershipForUser, getMembershipsForUser, normalizeAccountIds } from '../../shared/membership';
+import { getMembershipForUser, getMembershipInTenant, getMembershipsForUser, normalizeAccountIds } from '../../shared/membership';
+import { createTeamInvite } from '../../shared/team-invite';
 import { resolveDisplayCurrency } from '../../shared/display-currency';
 import { sendTextViaAws } from '../../shared/whatsapp';
 import { extractInbound, type InboundMessage } from '../inbound';
 import { decideWorkspace, chooseMessage, type ChoiceSession } from '../workspace-choice';
+import { continueInvite, isInviteRequest, startFromText, type InviteStep, type PendingInvite } from '../invite-flow';
 import type { AssistantContext, WorkspaceScope } from '../tools';
 
 /*
@@ -33,6 +35,12 @@ const AGENT_RUNTIME_ARN = process.env.ASSISTANT_RUNTIME_ARN!;
 const PHONE_NUMBER_ID = (process.env.WHATSAPP_ORIGINATION_PHONE_ID ?? '').trim();
 const HOURLY_LIMIT = Number(process.env.ASSISTANT_HOURLY_LIMIT ?? 20);
 /**
+ * Invite steps ("invite", a workspace number, an email, 1 or 2) have their
+ * own cap, so setting one up doesn't use up the questions. They never reach
+ * the model, but each still sends a reply, so they are capped too.
+ */
+const INVITE_HOURLY_LIMIT = 40;
+/**
  * Whether a number with no CloudMeter user gets told so. Off outside prod: dev
  * and prod share one WhatsApp number, so while dev is the one listening, a real
  * customer replying to a prod digest would reach dev — which has never heard of
@@ -44,6 +52,10 @@ const HISTORY_TTL_S = 30 * 60;
 /** How long a chosen workspace is remembered. */
 const SESSION_TTL_S = 12 * 60 * 60;
 const DEDUPE_TTL_S = 3 * 24 * 60 * 60;
+/** How long a half-finished WhatsApp invite waits for its next reply. */
+const INVITE_TTL_S = 15 * 60;
+const FROM_EMAIL = process.env.OTP_FROM_EMAIL ?? '';
+const PORTAL_URL = process.env.PORTAL_URL ?? 'https://portal.cloudmeter.io';
 
 const agentcore = new BedrockAgentCoreClient({});
 const nowS = () => Math.floor(Date.now() / 1000);
@@ -67,11 +79,18 @@ async function handleMessage(msg: InboundMessage): Promise<void> {
     return;
   }
 
-  const count = await countThisHour(msg.from);
-  if (count > HOURLY_LIMIT) {
+  // An invite under way, or one being started, is counted apart from questions.
+  const pendingInvite = await loadInvite(msg.from);
+  const isInviteStep = msg.type === 'text' && !!msg.text && (!!pendingInvite || isInviteRequest(msg.text));
+  const counter = isInviteStep ? 'invites' : 'questions';
+  const limit = isInviteStep ? INVITE_HOURLY_LIMIT : HOURLY_LIMIT;
+  const count = await countThisHour(msg.from, counter);
+  if (count > limit) {
     // Told once, then silent until the hour turns over.
-    if (count === HOURLY_LIMIT + 1) {
-      await sendTextViaAws(msg.from, `You've reached the limit of ${HOURLY_LIMIT} questions an hour. Please try again a little later, or open portal.cloudmeter.io.`);
+    if (count === limit + 1) {
+      await sendTextViaAws(msg.from, isInviteStep
+        ? 'That\'s a lot of invite steps for one hour. Please try again a little later, or invite people from Team at portal.cloudmeter.io.'
+        : `You've reached the limit of ${HOURLY_LIMIT} questions an hour. Please try again a little later, or open portal.cloudmeter.io.`);
     }
     return;
   }
@@ -96,12 +115,24 @@ async function handleMessage(msg: InboundMessage): Promise<void> {
   // on rohan@acme.com (no workspaces, verified later) and rohan@mobil80.com
   // (eleven); taking only the newest told him he had no workspace.
   let context: AssistantContext | null = null;
+  let contextUserId = '';
   for (const userId of users) {
     context = await contextFor(userId);
-    if (context) break;
+    if (context) { contextUserId = userId; break; }
   }
   if (!context) {
     await sendTextViaAws(msg.from, 'Your CloudMeter login isn\'t part of a workspace yet. Open portal.cloudmeter.io to set one up.');
+    return;
+  }
+
+  // Inviting a teammate: "invite …", or the next reply in one already under
+  // way. Handled here in plain code, before the agent, which stays read-only.
+  const inviteWorkspaces = context.workspaces.map((w) => ({ tenantId: w.tenantId, name: w.name, role: w.role }));
+  let inviteStep: InviteStep | null = null;
+  if (pendingInvite) inviteStep = continueInvite(pendingInvite, msg.text);
+  else if (isInviteRequest(msg.text)) inviteStep = startFromText(msg.text, inviteWorkspaces);
+  if (inviteStep) {
+    await runInviteStep(msg, contextUserId, inviteStep);
     return;
   }
 
@@ -143,6 +174,56 @@ async function handleMessage(msg: InboundMessage): Promise<void> {
   console.log(JSON.stringify({ answered: msg.id, tenantId: context.defaultTenantId, usedTenantId: used?.tenantId ?? null, workspaces: context.workspaces.length, toolsUsed: reply.toolsUsed, ms: Date.now() - started }));
 }
 
+async function runInviteStep(msg: InboundMessage, userId: string, step: InviteStep): Promise<void> {
+  if (step.kind === 'reply') {
+    await sendTextViaAws(msg.from, step.message);
+    await saveInvite(msg.from, step.pending);
+    console.log(JSON.stringify({ invitePrompt: msg.id, open: !!step.pending }));
+    return;
+  }
+
+  // The person's own membership in the chosen workspace, re-read now: the
+  // shared invite function checks role, read-only and billing against it.
+  await saveInvite(msg.from, null);
+  const membership = await getMembershipInTenant(userId, step.tenantId);
+  if (!membership) {
+    await sendTextViaAws(msg.from, 'You\'re no longer part of that workspace, so no invitation was sent.');
+    return;
+  }
+  const row = (await getMembershipsForUser(userId)).find((m) => String(m.PK) === `TENANT#${step.tenantId}`);
+  const caller = { userId, email: String(row?.email ?? ''), membership };
+  const res = await createTeamInvite(caller, { email: step.email, role: step.role, name: step.name ?? undefined }, { fromEmail: FROM_EMAIL, portalUrl: PORTAL_URL });
+  const status = typeof res === 'object' ? res.statusCode : 500;
+  const body = JSON.parse(typeof res === 'object' && typeof res.body === 'string' ? res.body : '{}') as { message?: string };
+
+  if (status === 201) {
+    const person = step.name ?? step.email;
+    const role = step.role === 'admin' ? 'an Admin' : 'a Member';
+    const access = step.role === 'member'
+      ? ` Members see only the cloud accounts you give them: choose those under Team at ${PORTAL_URL.replace(/^https:\/\//, '')}.`
+      : '';
+    await sendTextViaAws(msg.from, `Invitation emailed to ${step.email}. When ${person} signs in with that address, they'll join ${membership.tenantName ?? 'the workspace'} as ${role}.${access}`);
+  } else {
+    await sendTextViaAws(msg.from, `No invitation sent: ${body.message ?? 'something went wrong. Please try again from Team at portal.cloudmeter.io.'}`);
+  }
+  console.log(JSON.stringify({ inviteSent: msg.id, tenantId: step.tenantId, role: step.role, status }));
+}
+
+async function loadInvite(phone: string): Promise<PendingInvite | null> {
+  const { Item } = await ddb.send(new GetCommand({ TableName: TABLE_NAME, Key: { PK: `WAINVITE#${phone}`, SK: 'PENDING' } }));
+  if (!Item || Number(Item.expiresAt) < nowS()) return null;
+  return Item.pending as PendingInvite;
+}
+
+async function saveInvite(phone: string, pending: PendingInvite | null): Promise<void> {
+  const Key = { PK: `WAINVITE#${phone}`, SK: 'PENDING' };
+  if (!pending) {
+    await ddb.send(new DeleteCommand({ TableName: TABLE_NAME, Key }));
+    return;
+  }
+  await ddb.send(new PutCommand({ TableName: TABLE_NAME, Item: { ...Key, pending, expiresAt: nowS() + INVITE_TTL_S } }));
+}
+
 async function loadSession(phone: string): Promise<ChoiceSession> {
   const { Item } = await ddb.send(new GetCommand({ TableName: TABLE_NAME, Key: { PK: `WASESSION#${phone}`, SK: 'STATE' } }));
   if (!Item || Number(Item.expiresAt) < nowS()) return {};
@@ -175,16 +256,18 @@ async function claimOnce(key: string): Promise<boolean> {
   }
 }
 
-async function countThisHour(phone: string): Promise<number> {
+/** Adds one to this number's count for the hour; `counter` is 'questions' or 'invites'. */
+async function countThisHour(phone: string, counter: 'questions' | 'invites'): Promise<number> {
   const hour = new Date().toISOString().slice(0, 13);
   const { Attributes } = await ddb.send(new UpdateCommand({
     TableName: TABLE_NAME,
     Key: { PK: `WARATE#${phone}`, SK: hour },
-    UpdateExpression: 'ADD questions :one SET expiresAt = :exp',
+    UpdateExpression: 'ADD #c :one SET expiresAt = :exp',
+    ExpressionAttributeNames: { '#c': counter },
     ExpressionAttributeValues: { ':one': 1, ':exp': nowS() + 2 * 60 * 60 },
     ReturnValues: 'UPDATED_NEW',
   }));
-  return Number(Attributes?.questions ?? 1);
+  return Number(Attributes?.[counter] ?? 1);
 }
 
 /**

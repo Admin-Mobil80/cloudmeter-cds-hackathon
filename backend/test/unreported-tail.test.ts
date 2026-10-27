@@ -14,7 +14,7 @@
  *
  * Measured on prod the same week, the trailing day was partial for every live
  * AWS account, not just this one: Vandelay at 6% of a normal day, ACME 10%,
- * Umbrella 12%, AL STARK 23%, and Wayne Health and WONKA at exactly zero.
+ * Umbrella 12%, AL STARK 23%, and RCS Health and WONKA at exactly zero.
  */
 
 import { trimUnreportedTail, MAX_UNREPORTED_TAIL_DAYS } from '../functions/shared/persist-cost';

@@ -31,6 +31,8 @@ export interface NotificationsStackProps extends StackProps, EnvProps {
   customerBridgeRoleArn?: string;
   /** See ApiStackProps.whatsappAwsPhoneNumberId. Given to both sweeps. */
   whatsappAwsPhoneNumberId?: string;
+  /** See ApiStackProps.whatsappDigestTemplateWithServices. Given to the digest sweep. */
+  whatsappDigestTemplateWithServices?: string;
 }
 
 /**
@@ -287,6 +289,9 @@ export class NotificationsStack extends Stack {
     whatsappSecret.grantRead(sweepFn);
     sweepFn.addEnvironment('WHATSAPP_SECRET_ARN', whatsappSecret.secretArn);
     allowAwsWhatsApp(sweepFn, props.whatsappAwsPhoneNumberId);
+    if (props.whatsappDigestTemplateWithServices) {
+      sweepFn.addEnvironment('WHATSAPP_DIGEST_TEMPLATE_WITH_SERVICES', props.whatsappDigestTemplateWithServices);
+    }
     allowAwsWhatsApp(syncFn, props.whatsappAwsPhoneNumberId);
     slackSecret.grantRead(sweepFn);
     sweepFn.addToRolePolicy(slackTenantSecrets);

@@ -53,7 +53,7 @@ function fakeFetch(opts: { projectCallFails?: boolean } = {}) {
     }
     return costsResponse([bucket([
       { line_item: IMAGE, project_id: 'proj_rehearse', amount: { value: 16.598 } },
-      { line_item: IMAGE, project_id: 'proj_callcentral', amount: { value: 0.011 } },
+      { line_item: IMAGE, project_id: 'proj_initrode', amount: { value: 0.011 } },
       { line_item: TEXT, project_id: 'proj_luna', amount: { value: 0.08 } },
       // OpenAI reports every line item it has ever seen, most of them at $0.
       { line_item: 'whisper audio, input', project_id: 'proj_luna', amount: { value: 0 } },
@@ -89,7 +89,7 @@ describe('OpenAI daily project split', () => {
     const image = day.projectBreakdown![IMAGE];
     expect(image[0]).toEqual({ label: 'Rehearse RevenueCat', spend: 16.598 });
     // An id with no name known falls back to the id, as the monthly view does.
-    expect(image[1]).toEqual({ label: 'proj_callcentral', spend: 0.011 });
+    expect(image[1]).toEqual({ label: 'proj_initrode', spend: 0.011 });
     expect(day.projectBreakdown![TEXT]).toEqual([{ label: 'Luna', spend: 0.08 }]);
   });
 

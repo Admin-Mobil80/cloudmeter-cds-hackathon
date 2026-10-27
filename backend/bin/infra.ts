@@ -230,6 +230,18 @@ const WHATSAPP_AWS_PHONES: Record<string, Partial<Record<EnvName, string>>> = {
 const whatsappAwsPhone = (envName: EnvName) =>
   account ? WHATSAPP_AWS_PHONES[account]?.[envName] : undefined;
 
+/*
+ * The digest template that adds a "Top services on <day>" line, per account
+ * and environment. Listed environments send it; the rest keep the original
+ * cloudmeter_daily_digest. v5 (one service per line) approved by Meta; tested in dev, then prod.
+ * UAT stays on the original: it has no WhatsApp access through AWS anyway.
+ */
+const WHATSAPP_DIGEST_WITH_SERVICES: Record<string, Partial<Record<EnvName, string>>> = {
+  '975138397215': { dev: 'cloudmeter_daily_digest_v5', prod: 'cloudmeter_daily_digest_v5' },
+};
+const whatsappDigestWithServices = (envName: EnvName) =>
+  account ? WHATSAPP_DIGEST_WITH_SERVICES[account]?.[envName] : undefined;
+
 /**
  * Environments that run the WhatsApp AI cost assistant (Bedrock AgentCore,
  * with incoming WhatsApp messages arriving through SNS).
@@ -407,6 +419,7 @@ for (const envName of envNames) {
     schedulesEnabled: !schedulesPaused(envName),
     customerBridgeRoleArn,
     whatsappAwsPhoneNumberId: whatsappAwsPhone(envName),
+    whatsappDigestTemplateWithServices: whatsappDigestWithServices(envName),
   });
   envStacks.push(notificationsStack);
 
@@ -416,6 +429,8 @@ for (const envName of envNames) {
       envName,
       table: dataStack.table,
       whatsappAwsPhoneNumberId: whatsappAwsPhone(envName)!,
+      otpFromEmail,
+      portalUrl: portalUrlOverride ?? `https://${sites.find((s) => s.siteName === 'portal')!.domainName}`,
     }));
   }
 
@@ -439,6 +454,7 @@ for (const envName of envNames) {
     // domain — the marketing site calls /plans, so www belongs here too.
     customerBridgeRoleArn,
     whatsappAwsPhoneNumberId: whatsappAwsPhone(envName),
+    whatsappDigestTemplateWithServices: whatsappDigestWithServices(envName),
     webOrigins: [
       ...sites.flatMap((s) => [s.domainName, ...(s.extraDomainNames ?? [])]).map((d) => `https://${d}`),
       ...siteOrigins,

@@ -115,7 +115,11 @@ function renderSubscription() {
   const { subscription, plans, usage } = BILLING;
   const plan = plans.find(p => p.id === subscription.planId);
 
-  if (BILLING.checkoutAvailable === false) {
+  // Only when there is nothing to show yet. An active plan — one set up by the
+  // CloudMeter team, for instance — still gets its line and, for the Owner,
+  // Cancel subscription: card payments being off doesn't mean there is no
+  // subscription to manage.
+  if (BILLING.checkoutAvailable === false && !subscription.entitled) {
     note.classList.add('show');
     note.innerHTML = `<strong>Card payments aren't switched on yet.</strong> `
       + `You have full access in the meantime — nothing is charged, and no card is needed. `
@@ -159,10 +163,43 @@ function renderSubscription() {
       : '')
     + (subscription.canManage
       ? `<button class="link-btn-sm" id="manage-billing">Manage billing, invoices and payment method</button>`
-      : `Only the account owner or an admin can change the plan.`);
+      : `Only the account owner or an admin can change the plan.`)
+    // The Owner's alone, and only while it is still set to renew.
+    + (subscription.canCancel && !subscription.cancelAtPeriodEnd
+      ? `<div class="cancel-subscription"><button class="btn btn-sm btn-danger-ghost" id="cancel-subscription">Cancel subscription</button></div>`
+      : '');
 
   const manage = document.getElementById('manage-billing');
   if (manage) manage.addEventListener('click', openPortal);
+  const cancel = document.getElementById('cancel-subscription');
+  if (cancel) cancel.addEventListener('click', () => cancelSubscription(plan, ends));
+}
+
+/**
+ * Ends the subscription at the close of the paid period, after a plain
+ * confirmation saying what happens and when. The Owner keeps access until
+ * then; nothing is refunded or cut off early.
+ */
+async function cancelSubscription(plan, ends) {
+  const name = plan ? plan.name : 'your';
+  const ok = window.confirm(
+    `Cancel the ${name} plan?\n\n`
+    + `It won't renew${ends ? ` after ${ends}` : ''}. You keep full access until then, `
+    + `and you won't be charged again. You can choose a plan again at any time.`,
+  );
+  if (!ok) return;
+
+  const btn = document.getElementById('cancel-subscription');
+  btn.disabled = true;
+  btn.textContent = 'Cancelling…';
+  try {
+    await window.CM_Api.post('/billing/cancel');
+    if (await loadBilling()) { renderSubscription(); renderUsage(); wirePlanSelection(); }
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Cancel subscription';
+    window.alert(err.message || 'Could not cancel the subscription.');
+  }
 }
 
 /**

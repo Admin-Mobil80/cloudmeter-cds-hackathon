@@ -49,6 +49,11 @@ export interface ApiStackProps extends StackProps, EnvProps {
    * and its empty Meta secret is what keeps it from messaging them.
    */
   whatsappAwsPhoneNumberId?: string;
+  /**
+   * Name of the approved digest template with a "Top services" line. When
+   * unset, digests use the original cloudmeter_daily_digest.
+   */
+  whatsappDigestTemplateWithServices?: string;
 }
 
 export class ApiStack extends Stack {
@@ -230,6 +235,9 @@ export class ApiStack extends Stack {
     }, 30);
     whatsappSecret.grantRead(testDigestFn);
     allowAwsWhatsApp(testDigestFn, props.whatsappAwsPhoneNumberId);
+    if (props.whatsappDigestTemplateWithServices) {
+      testDigestFn.addEnvironment('WHATSAPP_DIGEST_TEMPLATE_WITH_SERVICES', props.whatsappDigestTemplateWithServices);
+    }
     testDigestFn.addToRolePolicy(new iam.PolicyStatement({
       actions: ['ses:SendEmail', 'ses:SendRawEmail'],
       resources: ['*'],
@@ -326,6 +334,15 @@ export class ApiStack extends Stack {
     }, 20);
     stripeSecret.grantRead(portalFn);
 
+    // Owner-only cancellation at the end of the paid period, on whichever
+    // gateway holds the subscription.
+    const cancelFn = this.route('/billing/cancel', [apigwv2.HttpMethod.POST], 'BillingCancel', 'api/billing/cancel', authorizer, {
+      STRIPE_SECRET_ARN: stripeSecret.secretArn,
+      RAZORPAY_SECRET_ARN: razorpaySecret.secretArn,
+    }, 20);
+    stripeSecret.grantRead(cancelFn);
+    razorpaySecret.grantRead(cancelFn);
+
     // Deliberately PUBLIC: Stripe holds no credentials of ours, so the request
     // signature is the security boundary and is verified in the handler.
     const stripeWebhookFn = this.route('/webhooks/stripe', [apigwv2.HttpMethod.POST], 'StripeWebhook', 'api/billing/webhook', null, {
@@ -364,7 +381,14 @@ export class ApiStack extends Stack {
       actions: ['ses:SendEmail', 'ses:SendRawEmail'],
       resources: ['*'],
     }));
-    this.route('/bms/tenants/{tenantId}/subscription', [apigwv2.HttpMethod.PUT], 'BmsTenantSubscription', 'api/bms/tenant-subscription', bmsAuthorizer);
+    // Reads the gateway before taking a tenant over by hand, so it needs both
+    // gateways' keys (read-only use: one GET of the subscription).
+    const bmsSubscriptionFn = this.route('/bms/tenants/{tenantId}/subscription', [apigwv2.HttpMethod.PUT], 'BmsTenantSubscription', 'api/bms/tenant-subscription', bmsAuthorizer, {
+      STRIPE_SECRET_ARN: stripeSecret.secretArn,
+      RAZORPAY_SECRET_ARN: razorpaySecret.secretArn,
+    });
+    stripeSecret.grantRead(bmsSubscriptionFn);
+    razorpaySecret.grantRead(bmsSubscriptionFn);
 
     // Irreversible: purges a whole customer account, credentials included.
     const bmsDeleteTenantFn = this.route('/bms/tenants/{tenantId}', [apigwv2.HttpMethod.DELETE], 'BmsTenantDelete', 'api/bms/tenant-delete', bmsAuthorizer, {

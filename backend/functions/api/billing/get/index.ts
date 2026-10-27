@@ -116,6 +116,8 @@ export const handler = async (event: APIGatewayProxyEventV2WithJWTAuthorizer) =>
       // only decides whether the button is offered, not whether the request
       // is honoured, so a mismatch here can't itself grant anything.
       canManage: caller.membership.role === 'owner' || caller.membership.role === 'admin',
+      // Ending the subscription is the Owner's alone; see api/billing/cancel.
+      canCancel: caller.membership.role === 'owner',
     },
     usage: {
       cloudAccounts: accounts.length,

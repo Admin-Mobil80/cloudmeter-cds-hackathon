@@ -7,6 +7,7 @@ import {
   oneMonthOn, trialEndFrom, renewFrom, extendTrialFrom,
 } from '../../../shared/subscription-period';
 import { getPricing } from '../../../shared/pricing';
+import { linkedSubscription } from '../../../shared/gateway-link';
 
 /**
  * Sets a tenant's plan and end date by hand.
@@ -16,9 +17,11 @@ import { getPricing } from '../../../shared/pricing';
  * limit and every page reads one set of values whatever put them there, and
  * records that a human did it so the two are never confused.
  *
- * Deliberately does not touch Stripe: if a tenant also has a Stripe
- * subscription, the next webhook will overwrite this. Mixing the two on one
- * tenant is a billing question, not something to paper over here.
+ * Setting or renewing a plan by hand takes the tenant over from its payment
+ * gateway: the Razorpay or Stripe link and any "set to cancel" flag are
+ * cleared, so the portal treats it as hand-managed. Never while that gateway
+ * subscription can still charge someone — see shared/gateway-link.ts — since
+ * unlinking it would leave a live charge nobody can cancel from the portal.
  */
 export const handler = async (event: APIGatewayProxyEventV2WithJWTAuthorizer) => {
   const caller = await resolveBmsCaller(event);
@@ -126,17 +129,46 @@ export const handler = async (event: APIGatewayProxyEventV2WithJWTAuthorizer) =>
 
   if (sets.length === 3) return json(400, { message: 'Nothing to update' });
 
+  // Taking the tenant over by hand: refused while the gateway can still
+  // charge, otherwise the gateway link goes. Trial extensions don't count —
+  // a trial has no plan to take over.
+  const removes: string[] = [];
+  if (body.planId !== undefined || body.action === 'renew') {
+    let link;
+    try {
+      link = await linkedSubscription(tenant);
+    } catch (err) {
+      console.error('Could not check the gateway subscription', tenantId, (err as Error).message);
+      return json(502, { message: 'Could not check this account\'s payment subscription with the payment provider, so nothing was changed. Try again in a minute.' });
+    }
+    if (link?.live) {
+      const ends = typeof tenant.currentPeriodEnd === 'string' ? ` on ${tenant.currentPeriodEnd.slice(0, 10)}` : '';
+      return json(409, {
+        message: `This account still has a live ${link.gateway === 'razorpay' ? 'Razorpay' : 'Stripe'} subscription (${link.id}, ${link.status}) that can charge a card. `
+          + `Cancel it first (the Owner can, under Billing and plan), and set the plan by hand after it ends${ends}.`,
+        gatewaySubscriptionId: link.id,
+        gatewayStatus: link.status,
+      });
+    }
+    if (link || tenant.cancelAtPeriodEnd) {
+      removes.push('gateway', 'gatewaySubscriptionId', 'stripeSubscriptionId');
+      sets.push('cancelAtPeriodEnd = :notCancelling');
+      values[':notCancelling'] = false;
+    }
+  }
+
   // `lastRenewedBy` reuses :by, already seeded above.
 
   await ddb.send(new UpdateCommand({
     TableName: TABLE_NAME,
     Key: { PK: `TENANT#${tenantId}`, SK: `TENANT#${tenantId}` },
-    UpdateExpression: `SET ${sets.join(', ')}`,
+    UpdateExpression: `SET ${sets.join(', ')}${removes.length ? ` REMOVE ${removes.join(', ')}` : ''}`,
     ExpressionAttributeValues: values,
   }));
 
   console.log('BMS subscription change', {
     tenantId, by: caller.email, planId: body.planId, action: body.action, end: values[':end'],
+    unlinkedGateway: removes.length > 0,
   });
 
   const { Item: updated } = await ddb.send(new GetCommand({

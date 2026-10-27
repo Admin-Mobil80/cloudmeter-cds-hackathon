@@ -1,4 +1,5 @@
 import { Digest, money } from './digest';
+import { serviceLabel } from './service-names';
 import { sendTemplate } from './whatsapp';
 
 const TEMPLATE = process.env.WHATSAPP_DIGEST_TEMPLATE ?? 'cloudmeter_daily_digest';
@@ -10,6 +11,18 @@ const TEMPLATE = process.env.WHATSAPP_DIGEST_TEMPLATE ?? 'cloudmeter_daily_diges
  * template fails the whole send (#132000).
  */
 const TEMPLATE_WITH_SERVICES = (process.env.WHATSAPP_DIGEST_TEMPLATE_WITH_SERVICES ?? '').trim();
+/**
+ * Versions whose services line names the day — "Top services on {{6}}: {{7}}"
+ * — and so take one more body value than v2's "Top services that day: {{6}}".
+ */
+const DATED_SERVICES_TEMPLATES = new Set(['cloudmeter_daily_digest_v3']);
+/**
+ * Versions with one service per line — "Top services on {{6}}:", then
+ * "• {{7}}", "• {{8}}", "• {{9}}" and a closing "{{10}}" for the rest — because
+ * a value itself may not contain a line break.
+ */
+const LISTED_SERVICES_TEMPLATES = new Set(['cloudmeter_daily_digest_v5']);
+const LISTED_SERVICES = 3;
 /** Services named on the WhatsApp line; the email carries the full table. */
 const WHATSAPP_SERVICES = 5;
 const LANGUAGE = process.env.WHATSAPP_DIGEST_LANGUAGE ?? 'en';
@@ -93,43 +106,111 @@ export function headerName(name: string, max = MAX_HEADER_NAME): string {
  * One line, because WhatsApp rejects a template parameter containing a new
  * line or a tab. Services with no cost that day are left out; if none had
  * any, it says so rather than sending an empty line.
+ *
+ * Each row is labelled with its provider and a short name (see serviceLabel),
+ * and rows that end up with the same label are added together before ranking:
+ * one OpenAI model billed as six usage types is one service here, not six.
  */
 export function servicesLine(digest: Digest, limit = WHATSAPP_SERVICES): string {
-  const day = (digest.services ?? []).filter((x) => x.daySpend > 0);
+  const day = rankedServices(digest);
   if (day.length === 0) return 'no service cost reported that day';
   const parts = day.slice(0, limit).map((x) => `${x.service} ${money(x.daySpend, digest.currency)}`);
   const more = day.length - limit;
   return more > 0 ? `${parts.join(' · ')} · +${more} more` : parts.join(' · ');
 }
 
+/** The day's services, labelled, merged by label and ranked by cost. */
+function rankedServices(digest: Digest): Array<{ service: string; daySpend: number }> {
+  const byName = new Map<string, number>();
+  for (const x of digest.services ?? []) {
+    if (x.daySpend <= 0) continue;
+    const name = serviceLabel(x.provider, x.service);
+    byName.set(name, (byName.get(name) ?? 0) + x.daySpend);
+  }
+  return Array.from(byName, ([service, daySpend]) => ({ service, daySpend }))
+    .sort((a, b) => b.daySpend - a.daySpend);
+}
+
+/**
+ * The values for v5's service lines: one per listed service ("—" for an
+ * empty slot, since a template value may not be blank), then the rest.
+ */
+export function listedServiceValues(digest: Digest, slots = LISTED_SERVICES): string[] {
+  const day = rankedServices(digest);
+  const lines = Array.from({ length: slots }, (_, i) => (day[i]
+    ? `${day[i].service} ${serviceMoney(day[i].daySpend, digest.currency)}`
+    : '—'));
+  const more = day.length - slots;
+  if (day.length === 0) return [...lines, 'No service cost reported that day'];
+  return [...lines, more > 0 ? `+${more} more in the dashboard` : 'No other services'];
+}
+
+/**
+ * A service's cost, with cents below 10 of the display currency. Whole units
+ * made every small service read "$1", which says nothing about which costs
+ * more; the day's totals keep whole units.
+ */
+export function serviceMoney(n: number, currency?: Digest['currency']): string {
+  const usable = currency && Number.isFinite(currency.rate) && currency.rate > 0 ? currency : undefined;
+  const converted = n * (usable?.rate ?? 1);
+  if (converted >= 10) return money(n, currency);
+  const symbol = usable?.symbol ?? '$';
+  if (converted < 0.01) return `under ${symbol}0.01`;
+  const locale = usable?.code === 'INR' ? 'en-IN' : 'en-US';
+  return `${symbol}${converted.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 export async function sendDigestWhatsApp(digest: Digest, phone: string): Promise<string> {
-  const monthTrend = digest.monthDeltaPct === null
-    ? 'no prior month to compare'
-    : `${digest.monthDeltaPct >= 0 ? 'up' : 'down'} ${Math.abs(digest.monthDeltaPct).toFixed(0)}%`;
-
-  const top = digest.movers[0];
-  const biggestMover = top
-    ? `${top.service}, up ${money(top.delta, digest.currency)}`
-    : 'nothing moved unusually';
-
-  const withServices = !!TEMPLATE_WITH_SERVICES;
-  const { messageId } = await sendTemplate(phone, withServices ? TEMPLATE_WITH_SERVICES : TEMPLATE, LANGUAGE, [
+  const template = TEMPLATE_WITH_SERVICES || TEMPLATE;
+  const { messageId } = await sendTemplate(phone, template, LANGUAGE, [
     {
       type: 'header',
       parameters: [{ type: 'text', text: headerName(digest.tenantName) }],
     },
     {
       type: 'body',
-      parameters: [
-        digest.dayLabel,
-        money(digest.daySpend, digest.currency),
-        money(digest.monthToDate, digest.currency),
-        monthTrend,
-        biggestMover,
-        ...(withServices ? [servicesLine(digest)] : []),
-      ].map((text) => ({ type: 'text', text })),
+      parameters: digestBodyValues(digest, template).map((text) => ({ type: 'text', text })),
     },
   ]);
 
   return messageId;
+}
+
+/**
+ * The body values, in order, for whichever digest template is being sent.
+ * The count must match that template exactly: five for the original, six for
+ * v2 (services), seven for v3 (the day, then services), ten for v5 (the day,
+ * three service lines, then the rest).
+ */
+export function digestBodyValues(digest: Digest, template: string): string[] {
+  const monthTrend = digest.monthDeltaPct === null
+    ? 'no prior month to compare'
+    : `${digest.monthDeltaPct >= 0 ? 'up' : 'down'} ${Math.abs(digest.monthDeltaPct).toFixed(0)}%`;
+
+  const top = digest.movers[0];
+  const biggestMover = top
+    ? `${serviceLabel(top.provider, top.service)}, up ${money(top.delta, digest.currency)}`
+    : 'nothing moved unusually';
+
+  const values = [
+    digest.dayLabel,
+    money(digest.daySpend, digest.currency),
+    money(digest.monthToDate, digest.currency),
+    monthTrend,
+    biggestMover,
+  ];
+  if (template === TEMPLATE) return values;
+  if (LISTED_SERVICES_TEMPLATES.has(template)) {
+    return [...values, shortDay(digest.dayKey), ...listedServiceValues(digest)];
+  }
+  if (DATED_SERVICES_TEMPLATES.has(template)) values.push(shortDay(digest.dayKey));
+  values.push(servicesLine(digest));
+  return values;
+}
+
+/** "2026-10-24" -> "24 Oct": the year is already on the first line. */
+function shortDay(dayKey: string): string {
+  return new Date(`${dayKey}T00:00:00Z`).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'short', timeZone: 'UTC',
+  });
 }
