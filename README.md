@@ -73,11 +73,11 @@ only after the Owner or Admin confirms the role.
 ## About this repository
 
 This is a snapshot of CloudMeter's four codebases, published for the AWS CDS
-Agentic AI Partner Hackathon. The commit history is in Mobil80's private
-repositories. CloudMeter's first commit was on 17 August 2026; the WhatsApp AI
-agent and the WhatsApp delivery through AWS End User Messaging Social were built
-during the Submission Period — see "Built before and during the hackathon" in
-the [backend README](backend/README.md).
+Agentic AI Partner Hackathon. This repository's first commit was on
+26 October 2026; the full commit history is in Mobil80's private repositories.
+The WhatsApp AI agent and the WhatsApp delivery through AWS End User Messaging
+Social were built during the Submission Period — see "Built before and during
+the hackathon" in the [backend README](backend/README.md).
 
 Customer and staff names in sample data, tests and comments have been replaced
 with placeholders.
